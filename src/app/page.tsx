@@ -28,13 +28,19 @@ export default function Home() {
   const [filters, setFilters] = useState<FilterState>(defaultFilters)
   const [exporting, setExporting] = useState(false)
 
-  const { actions, loading, fetchActions, addAction, updateAction, deleteAction } = useActions(tab === 'archive')
-  const filteredActions = useFilteredActions(actions, filters)
+  // Single hook — loads everything, no tab-based reload
+  const { actions, loading, fetchActions, addAction, updateAction, deleteAction } = useActions()
+
+  const isArchive = tab === 'archive'
+  const filteredActions = useFilteredActions(actions, filters, isArchive)
+
+  // For filter dropdowns: show options relevant to current tab
+  const tabActions = useMemo(() => actions.filter(a => a.archived === isArchive), [actions, isArchive])
 
   const handleAdd = async (data: Parameters<typeof addAction>[0]) => {
     try {
       await addAction(data)
-      toast.success('Action added successfully')
+      toast.success('Action added')
     } catch (e) {
       toast.error('Failed to add action')
     }
@@ -44,23 +50,23 @@ export default function Home() {
     try {
       await updateAction(id, updates)
       if (updates.status === true) {
-        toast.success('Action marked as done and archived')
+        toast.success('Marked as done — moved to Archive')
       } else if (updates.archived === false) {
-        toast.success('Action restored to active list')
+        toast.success('Restored to Active')
       } else {
-        toast.success('Action updated')
+        toast.success('Saved')
       }
     } catch (e) {
-      toast.error('Failed to update action')
+      toast.error('Failed to update')
     }
   }
 
   const handleDelete = async (id: string) => {
     try {
       await deleteAction(id)
-      toast.success('Action deleted')
+      toast.success('Deleted')
     } catch (e) {
-      toast.error('Failed to delete action')
+      toast.error('Failed to delete')
     }
   }
 
@@ -68,18 +74,18 @@ export default function Home() {
     setExporting(true)
     try {
       await exportToExcel(filteredActions, `action-plan-${tab}`)
-      toast.success('Excel file exported successfully')
+      toast.success('Excel exported')
     } catch (e) {
-      toast.error('Failed to export')
+      toast.error('Export failed')
     } finally {
       setExporting(false)
     }
   }
 
   const stats = useMemo(() => ({
-    total: actions.length,
-    done: actions.filter(a => a.status).length,
-    pending: actions.filter(a => !a.status).length,
+    total: actions.filter(a => !a.archived).length,
+    pending: actions.filter(a => !a.archived && !a.status).length,
+    done: actions.filter(a => a.archived).length,
   }), [actions])
 
   return (
@@ -132,7 +138,7 @@ export default function Home() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-lg border border-slate-200 p-4">
-            <p className="text-xs text-slate-500 mb-1">Total Actions</p>
+            <p className="text-xs text-slate-500 mb-1">Active Actions</p>
             <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
           </div>
           <div className="bg-white rounded-lg border border-slate-200 p-4">
@@ -152,14 +158,24 @@ export default function Home() {
               <TabsTrigger value="active" className="gap-1.5">
                 <ClipboardList className="h-3.5 w-3.5" />
                 Active
+                {stats.total > 0 && (
+                  <span className="ml-1 text-xs bg-slate-200 text-slate-600 rounded-full px-1.5 py-0.5 leading-none">
+                    {stats.total}
+                  </span>
+                )}
               </TabsTrigger>
               <TabsTrigger value="archive" className="gap-1.5">
                 <Archive className="h-3.5 w-3.5" />
                 Archive
+                {stats.done > 0 && (
+                  <span className="ml-1 text-xs bg-slate-200 text-slate-600 rounded-full px-1.5 py-0.5 leading-none">
+                    {stats.done}
+                  </span>
+                )}
               </TabsTrigger>
             </TabsList>
             <div className="flex-1">
-              <FilterBar filters={filters} onFiltersChange={setFilters} actions={actions} />
+              <FilterBar filters={filters} onFiltersChange={setFilters} actions={tabActions} />
             </div>
           </div>
 
@@ -195,7 +211,7 @@ export default function Home() {
 
           {filteredActions.length > 0 && (
             <p className="text-xs text-slate-400 mt-2 text-right">
-              Showing {filteredActions.length} of {actions.length} actions
+              Showing {filteredActions.length} of {tabActions.length}
             </p>
           )}
         </Tabs>

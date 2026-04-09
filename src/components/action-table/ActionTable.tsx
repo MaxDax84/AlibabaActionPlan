@@ -38,24 +38,13 @@ interface ActionTableProps {
 
 export function ActionTable({ actions, onUpdate, onDelete, showArchived = false }: ActionTableProps) {
   const [editingAction, setEditingAction] = useState<Action | null>(null)
-  const [loadingId, setLoadingId] = useState<string | null>(null)
 
   const handleStatusToggle = async (action: Action) => {
-    setLoadingId(action.id)
-    try {
-      await onUpdate(action.id, { status: !action.status, archived: !action.status })
-    } finally {
-      setLoadingId(null)
-    }
+    await onUpdate(action.id, { status: !action.status, archived: !action.status })
   }
 
   const handleRestore = async (action: Action) => {
-    setLoadingId(action.id)
-    try {
-      await onUpdate(action.id, { status: false, archived: false })
-    } finally {
-      setLoadingId(null)
-    }
+    await onUpdate(action.id, { status: false, archived: false })
   }
 
   if (actions.length === 0) {
@@ -132,7 +121,6 @@ export function ActionTable({ actions, onUpdate, onDelete, showArchived = false 
                       variant="ghost"
                       size="sm"
                       onClick={() => handleRestore(action)}
-                      disabled={loadingId === action.id}
                       className="h-7 px-2 text-xs text-amber-600 hover:text-amber-700"
                     >
                       <ArchiveRestore className="h-3.5 w-3.5 mr-1" />
@@ -143,7 +131,6 @@ export function ActionTable({ actions, onUpdate, onDelete, showArchived = false 
                       <Switch
                         checked={action.status}
                         onCheckedChange={() => handleStatusToggle(action)}
-                        disabled={loadingId === action.id}
                         className="data-[state=checked]:bg-green-500"
                       />
                       {action.status && (

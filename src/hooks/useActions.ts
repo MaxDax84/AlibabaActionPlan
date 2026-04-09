@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 
 const DEBOUNCE_SAVE_MS = 5 * 60 * 1000 // 5 minutes
 
-export function useActions(showArchived: boolean = false) {
+export function useActions() {
   const [actions, setActions] = useState<Action[]>([])
   const [loading, setLoading] = useState(true)
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null)
@@ -30,64 +30,111 @@ export function useActions(showArchived: boolean = false) {
 
   const fetchActions = useCallback(async () => {
     try {
-      const res = await fetch(`/api/actions?archived=${showArchived}`)
-      const data = await res.json()
-      setActions(data || [])
+      // Load both active and archived in parallel
+      const [activeRes, archivedRes] = await Promise.all([
+        fetch('/api/actions?archived=false'),
+        fetch('/api/actions?archived=true'),
+      ])
+      const [active, archived] = await Promise.all([activeRes.json(), archivedRes.json()])
+      setActions([...(active || []), ...(archived || [])])
     } catch (e) {
       toast.error('Failed to load actions')
     } finally {
       setLoading(false)
     }
-  }, [showArchived])
+  }, [])
 
   useEffect(() => {
     fetchActions()
   }, [fetchActions])
 
   const addAction = useCallback(async (action: Omit<Action, 'id' | 'created_at' | 'updated_at' | 'archived'>) => {
-    const res = await fetch('/api/actions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(action),
-    })
-    if (!res.ok) throw new Error('Failed to add action')
-    const newAction = await res.json()
-    setActions(prev => [newAction, ...prev])
-    scheduleVersionSave()
-    return newAction
+    // Optimistic: create a temp action immediately
+    const tempId = `temp-${Date.now()}`
+    const optimistic: Action = {
+      ...action,
+      id: tempId,
+      archived: false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+    setActions(prev => [optimistic, ...prev])
+
+    try {
+      const res = await fetch('/api/actions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(action),
+      })
+      if (!res.ok) throw new Error('Failed to add action')
+      const newAction = await res.json()
+      // Replace temp with real
+      setActions(prev => prev.map(a => a.id === tempId ? newAction : a))
+      scheduleVersionSave()
+      return newAction
+    } catch (err) {
+      // Rollback
+      setActions(prev => prev.filter(a => a.id !== tempId))
+      throw err
+    }
   }, [scheduleVersionSave])
 
   const updateAction = useCallback(async (id: string, updates: Partial<Action>) => {
-    const res = await fetch(`/api/actions/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updates),
-    })
-    if (!res.ok) throw new Error('Failed to update action')
-    const updated = await res.json()
+    // Optimistic: apply update immediately
+    let previous: Action | undefined
     setActions(prev => {
-      // If archived (marked done), remove from active list
-      if (updated.archived && !showArchived) {
-        return prev.filter(a => a.id !== id)
-      }
-      return prev.map(a => a.id === id ? updated : a)
+      previous = prev.find(a => a.id === id)
+      return prev.map(a => a.id === id ? { ...a, ...updates } : a)
     })
-    scheduleVersionSave()
-    return updated
-  }, [scheduleVersionSave, showArchived])
+
+    try {
+      const res = await fetch(`/api/actions/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      })
+      if (!res.ok) throw new Error('Failed to update action')
+      const updated = await res.json()
+      // Sync with real server response
+      setActions(prev => prev.map(a => a.id === id ? updated : a))
+      scheduleVersionSave()
+      return updated
+    } catch (err) {
+      // Rollback
+      if (previous) {
+        setActions(prev => prev.map(a => a.id === id ? previous! : a))
+      }
+      throw err
+    }
+  }, [scheduleVersionSave])
 
   const deleteAction = useCallback(async (id: string) => {
-    const res = await fetch(`/api/actions/${id}`, { method: 'DELETE' })
-    if (!res.ok) throw new Error('Failed to delete action')
-    setActions(prev => prev.filter(a => a.id !== id))
-    scheduleVersionSave()
+    // Optimistic: remove immediately
+    let previous: Action | undefined
+    setActions(prev => {
+      previous = prev.find(a => a.id === id)
+      return prev.filter(a => a.id !== id)
+    })
+
+    try {
+      const res = await fetch(`/api/actions/${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Failed to delete action')
+      scheduleVersionSave()
+    } catch (err) {
+      // Rollback
+      if (previous) {
+        setActions(prev => [previous!, ...prev])
+      }
+      throw err
+    }
   }, [scheduleVersionSave])
 
   return { actions, loading, fetchActions, addAction, updateAction, deleteAction }
 }
 
-export function useFilteredActions(actions: Action[], filters: FilterState) {
+export function useFilteredActions(actions: Action[], filters: FilterState, archived: boolean) {
   return actions.filter(action => {
+    if (action.archived !== archived) return false
     if (filters.owner && filters.owner !== 'all' && action.owner !== filters.owner) return false
     if (filters.quarter && filters.quarter !== 'all' && action.impact_quarter !== filters.quarter) return false
     if (filters.stage && filters.stage !== 'all' && action.stage !== filters.stage) return false

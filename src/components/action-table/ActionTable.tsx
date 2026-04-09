@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { Action } from '@/lib/types'
 import { STAGE_COLORS, STAGES } from '@/lib/constants'
 import { Badge } from '@/components/ui/badge'
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Trash2, ArchiveRestore, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { QuarterMultiSelect, parseQuarters } from '@/components/ui/quarter-multi-select'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Table,
   TableBody,
@@ -102,69 +103,55 @@ function InlineText({
   )
 }
 
-// Inline stage selector — looks like a badge, opens dropdown on click
+// Inline stage selector — badge at rest, full Popover portal on click
 function InlineStage({ value, onSave }: { value: string; onSave: (v: string) => void }) {
   const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
+  const dotColor: Record<string, string> = {
+    'Lead Generation': 'bg-blue-400',
+    'New Customer Acquisition': 'bg-green-400',
+    'Customer Success': 'bg-purple-400',
+    'Product Development': 'bg-orange-400',
+    'Operations': 'bg-slate-400',
+    'Marketing': 'bg-pink-400',
+    'Finance': 'bg-yellow-400',
+    'HR': 'bg-teal-400',
+    'Technology': 'bg-indigo-400',
+    'Strategy': 'bg-red-400',
+  }
 
   return (
-    <div ref={ref} className="relative inline-block">
-      <button
-        type="button"
-        onClick={() => setOpen(o => !o)}
-        title="Click to change stage"
-        className="focus:outline-none"
-      >
-        <Badge
-          variant="outline"
-          className={cn(
-            'text-xs font-medium whitespace-nowrap cursor-pointer',
-            'hover:opacity-80 transition-opacity',
-            STAGE_COLORS[value] || 'bg-slate-100 text-slate-700'
-          )}
-        >
-          {value}
-        </Badge>
-      </button>
-
-      {open && (
-        <div className="absolute z-50 mt-1 left-0 bg-white border border-slate-200 rounded-md shadow-lg py-1 min-w-[180px]">
-          {STAGES.map(s => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => { onSave(s); setOpen(false) }}
-              className={cn(
-                'flex items-center gap-2 w-full px-3 py-1.5 text-xs hover:bg-slate-50 transition-colors text-left',
-                s === value && 'font-semibold'
-              )}
-            >
-              <span className={cn(
-                'inline-block w-2 h-2 rounded-full shrink-0',
-                STAGE_COLORS[s]?.includes('blue') ? 'bg-blue-400' :
-                STAGE_COLORS[s]?.includes('green') ? 'bg-green-400' :
-                STAGE_COLORS[s]?.includes('purple') ? 'bg-purple-400' :
-                STAGE_COLORS[s]?.includes('orange') ? 'bg-orange-400' :
-                STAGE_COLORS[s]?.includes('pink') ? 'bg-pink-400' :
-                STAGE_COLORS[s]?.includes('yellow') ? 'bg-yellow-400' :
-                STAGE_COLORS[s]?.includes('teal') ? 'bg-teal-400' :
-                STAGE_COLORS[s]?.includes('indigo') ? 'bg-indigo-400' :
-                STAGE_COLORS[s]?.includes('red') ? 'bg-red-400' : 'bg-slate-400'
-              )} />
-              {s}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button type="button" title="Click to change stage" className="focus:outline-none">
+          <Badge
+            variant="outline"
+            className={cn(
+              'text-xs font-medium whitespace-nowrap cursor-pointer hover:opacity-75 transition-opacity',
+              STAGE_COLORS[value] || 'bg-slate-100 text-slate-700'
+            )}
+          >
+            {value}
+          </Badge>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-52 p-1" align="start" side="bottom">
+        {STAGES.map(s => (
+          <button
+            key={s}
+            type="button"
+            onClick={() => { onSave(s); setOpen(false) }}
+            className={cn(
+              'flex items-center gap-2.5 w-full px-3 py-2 text-sm rounded hover:bg-slate-50 transition-colors text-left',
+              s === value && 'bg-slate-50 font-semibold'
+            )}
+          >
+            <span className={cn('w-2 h-2 rounded-full shrink-0', dotColor[s] || 'bg-slate-400')} />
+            {s}
+          </button>
+        ))}
+      </PopoverContent>
+    </Popover>
   )
 }
 
@@ -202,7 +189,7 @@ export function ActionTable({ actions, onUpdate, onDelete, showArchived = false 
             <TableHead className="w-[170px] font-semibold text-slate-700">Stage</TableHead>
             <TableHead className="font-semibold text-slate-700">Action</TableHead>
             <TableHead className="w-[120px] font-semibold text-slate-700">Owner</TableHead>
-            <TableHead className="w-[90px] font-semibold text-slate-700">Quarter</TableHead>
+            <TableHead className="font-semibold text-slate-700">Quarter</TableHead>
             <TableHead className="w-[220px] font-semibold text-slate-700">KPI</TableHead>
             <TableHead className="w-[70px] text-center font-semibold text-slate-700">Done</TableHead>
             <TableHead className="w-[50px] text-center font-semibold text-slate-700"></TableHead>
@@ -277,6 +264,7 @@ export function ActionTable({ actions, onUpdate, onDelete, showArchived = false 
                       value={action.impact_quarter || ''}
                       onChange={v => onUpdate(action.id, { impact_quarter: v })}
                       inline
+                      className="w-full min-w-[80px]"
                     />
                   )}
                 </TableCell>

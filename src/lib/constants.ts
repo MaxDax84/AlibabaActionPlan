@@ -1,7 +1,12 @@
 export const STAGES = [
+  'Business Analysis',
+  'ICP Operation',
   'Lead Generation',
   'New Customer Acquisition',
   'Customer Success',
+  'Buyers',
+  'Gov. Project',
+  'Teams Management',
   'Product Development',
   'Operations',
   'Marketing',
@@ -11,17 +16,40 @@ export const STAGES = [
   'Strategy',
 ]
 
-export const QUARTERS = ['Q1', 'Q2', 'Q3', 'Q4']
+export const QUARTERS = ['Q1', 'Q2', 'Q3', 'Q4', 'FY27', 'TBC']
 
 export const STAGE_COLORS: Record<string, string> = {
-  'Lead Generation': 'bg-blue-100 text-blue-800 border-blue-200',
-  'New Customer Acquisition': 'bg-green-100 text-green-800 border-green-200',
-  'Customer Success': 'bg-purple-100 text-purple-800 border-purple-200',
-  'Product Development': 'bg-orange-100 text-orange-800 border-orange-200',
-  'Operations': 'bg-gray-100 text-gray-800 border-gray-200',
-  'Marketing': 'bg-pink-100 text-pink-800 border-pink-200',
-  'Finance': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-  'HR': 'bg-teal-100 text-teal-800 border-teal-200',
-  'Technology': 'bg-indigo-100 text-indigo-800 border-indigo-200',
-  'Strategy': 'bg-red-100 text-red-800 border-red-200',
+  'Business Analysis':       'bg-cyan-100 text-cyan-800 border-cyan-200',
+  'ICP Operation':           'bg-sky-100 text-sky-800 border-sky-200',
+  'Lead Generation':         'bg-blue-100 text-blue-800 border-blue-200',
+  'New Customer Acquisition':'bg-green-100 text-green-800 border-green-200',
+  'Customer Success':        'bg-purple-100 text-purple-800 border-purple-200',
+  'Buyers':                  'bg-rose-100 text-rose-800 border-rose-200',
+  'Gov. Project':            'bg-amber-100 text-amber-800 border-amber-200',
+  'Teams Management':        'bg-slate-100 text-slate-800 border-slate-200',
+  'Product Development':     'bg-orange-100 text-orange-800 border-orange-200',
+  'Operations':              'bg-gray-100 text-gray-800 border-gray-200',
+  'Marketing':               'bg-pink-100 text-pink-800 border-pink-200',
+  'Finance':                 'bg-yellow-100 text-yellow-800 border-yellow-200',
+  'HR':                      'bg-teal-100 text-teal-800 border-teal-200',
+  'Technology':              'bg-indigo-100 text-indigo-800 border-indigo-200',
+  'Strategy':                'bg-red-100 text-red-800 border-red-200',
+}
+
+export const STAGE_DOT_COLORS: Record<string, string> = {
+  'Business Analysis':       'bg-cyan-400',
+  'ICP Operation':           'bg-sky-400',
+  'Lead Generation':         'bg-blue-400',
+  'New Customer Acquisition':'bg-green-400',
+  'Customer Success':        'bg-purple-400',
+  'Buyers':                  'bg-rose-400',
+  'Gov. Project':            'bg-amber-400',
+  'Teams Management':        'bg-slate-400',
+  'Product Development':     'bg-orange-400',
+  'Operations':              'bg-gray-400',
+  'Marketing':               'bg-pink-400',
+  'Finance':                 'bg-yellow-400',
+  'HR':                      'bg-teal-400',
+  'Technology':              'bg-indigo-400',
+  'Strategy':                'bg-red-400',
 }

@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --yes)",
+      "Bash(npx create-next-app@latest action-plan-temp --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --yes)",
+      "Bash(cp:*)",
+      "Bash(npm install:*)",
+      "Bash(npx shadcn@latest init -y)",
+      "Bash(npx shadcn@latest add button input label select table dialog badge switch textarea --yes)",
+      "Bash(npx shadcn@latest add collapsible alert-dialog tabs --yes)",
+      "Bash(mkdir -p \"C:/Users/Massimo/Documents/Projects/Alibaba/Action Plan/src/lib\")",
+      "Bash(mkdir -p \"C:/Users/Massimo/Documents/Projects/Alibaba/Action Plan/src/hooks\")",
+      "Bash(mkdir -p \"C:/Users/Massimo/Documents/Projects/Alibaba/Action Plan/src/components/action-table\")",
+      "Bash(mkdir -p \"C:/Users/Massimo/Documents/Projects/Alibaba/Action Plan/src/components/dialogs\")",
+      "Bash(mkdir -p \"C:/Users/Massimo/Documents/Projects/Alibaba/Action Plan/src/components/filters\")",
+      "Bash(ls *.config.*)",
+      "Bash(npm run:*)",
+      "Bash(npm list:*)",
+      "Bash(rm:*)",
+      "Bash(npx shadcn@latest add popover --yes)"
+    ]
+  }
+}

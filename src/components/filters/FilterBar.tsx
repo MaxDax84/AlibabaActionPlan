@@ -64,7 +64,12 @@ function OwnerFilter({
   const handleFocus = () => {
     if (wrapperRef.current) {
       const rect = wrapperRef.current.getBoundingClientRect()
-      setCoords({ top: rect.bottom + window.scrollY + 4, left: rect.left + window.scrollX, width: rect.width })
+      const DROPDOWN_H = 200
+      const spaceBelow = window.innerHeight - rect.bottom
+      const top = spaceBelow >= DROPDOWN_H
+        ? rect.bottom + window.scrollY + 4
+        : rect.top + window.scrollY - DROPDOWN_H - 4
+      setCoords({ top, left: rect.left + window.scrollX, width: rect.width })
     }
     setOpen(true)
   }

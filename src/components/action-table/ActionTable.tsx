@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { Action } from '@/lib/types'
-import { STAGE_COLORS, STAGES } from '@/lib/constants'
+import { STAGE_COLORS, STAGE_DOT_COLORS, STAGES } from '@/lib/constants'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Trash2, ArchiveRestore, Check } from 'lucide-react'
@@ -34,6 +34,7 @@ interface ActionTableProps {
   onUpdate: (id: string, updates: Partial<Action>) => Promise<void>
   onDelete: (id: string) => Promise<void>
   showArchived?: boolean
+  hideStageColumn?: boolean
 }
 
 const FADE_DURATION = 400
@@ -106,20 +107,6 @@ function InlineText({
 // Inline stage selector — badge at rest, full Popover portal on click
 function InlineStage({ value, onSave }: { value: string; onSave: (v: string) => void }) {
   const [open, setOpen] = useState(false)
-
-  const dotColor: Record<string, string> = {
-    'Lead Generation': 'bg-blue-400',
-    'New Customer Acquisition': 'bg-green-400',
-    'Customer Success': 'bg-purple-400',
-    'Product Development': 'bg-orange-400',
-    'Operations': 'bg-slate-400',
-    'Marketing': 'bg-pink-400',
-    'Finance': 'bg-yellow-400',
-    'HR': 'bg-teal-400',
-    'Technology': 'bg-indigo-400',
-    'Strategy': 'bg-red-400',
-  }
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -135,7 +122,8 @@ function InlineStage({ value, onSave }: { value: string; onSave: (v: string) => 
           </Badge>
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-52 p-1" align="start" side="bottom">
+      {/* avoidCollisions + sideOffset ensure it never clips the viewport */}
+      <PopoverContent className="w-52 p-1" align="start" side="bottom" sideOffset={4} avoidCollisions>
         {STAGES.map(s => (
           <button
             key={s}
@@ -146,7 +134,7 @@ function InlineStage({ value, onSave }: { value: string; onSave: (v: string) => 
               s === value && 'bg-slate-50 font-semibold'
             )}
           >
-            <span className={cn('w-2 h-2 rounded-full shrink-0', dotColor[s] || 'bg-slate-400')} />
+            <span className={cn('w-2 h-2 rounded-full shrink-0', STAGE_DOT_COLORS[s] || 'bg-slate-400')} />
             {s}
           </button>
         ))}
@@ -155,7 +143,7 @@ function InlineStage({ value, onSave }: { value: string; onSave: (v: string) => 
   )
 }
 
-export function ActionTable({ actions, onUpdate, onDelete, showArchived = false }: ActionTableProps) {
+export function ActionTable({ actions, onUpdate, onDelete, showArchived = false, hideStageColumn = false }: ActionTableProps) {
   const [fadingIds, setFadingIds] = useState<Set<string>>(new Set())
 
   const handleDone = (action: Action) => {
@@ -186,7 +174,7 @@ export function ActionTable({ actions, onUpdate, onDelete, showArchived = false 
       <Table>
         <TableHeader>
           <TableRow className="bg-slate-50 hover:bg-slate-50">
-            <TableHead className="w-[170px] font-semibold text-slate-700">Stage</TableHead>
+            {!hideStageColumn && <TableHead className="w-[170px] font-semibold text-slate-700">Stage</TableHead>}
             <TableHead className="font-semibold text-slate-700">Action</TableHead>
             <TableHead className="w-[120px] font-semibold text-slate-700">Owner</TableHead>
             <TableHead className="font-semibold text-slate-700">Quarter</TableHead>
@@ -209,21 +197,23 @@ export function ActionTable({ actions, onUpdate, onDelete, showArchived = false 
                 className="hover:bg-slate-50/60 align-top"
               >
                 {/* Stage */}
-                <TableCell className="py-2">
-                  {showArchived ? (
-                    <Badge
-                      variant="outline"
-                      className={cn('text-xs font-medium whitespace-nowrap', STAGE_COLORS[action.stage] || 'bg-slate-100 text-slate-700')}
-                    >
-                      {action.stage}
-                    </Badge>
-                  ) : (
-                    <InlineStage
-                      value={action.stage}
-                      onSave={v => onUpdate(action.id, { stage: v })}
-                    />
-                  )}
-                </TableCell>
+                {!hideStageColumn && (
+                  <TableCell className="py-2">
+                    {showArchived ? (
+                      <Badge
+                        variant="outline"
+                        className={cn('text-xs font-medium whitespace-nowrap', STAGE_COLORS[action.stage] || 'bg-slate-100 text-slate-700')}
+                      >
+                        {action.stage}
+                      </Badge>
+                    ) : (
+                      <InlineStage
+                        value={action.stage}
+                        onSave={v => onUpdate(action.id, { stage: v })}
+                      />
+                    )}
+                  </TableCell>
+                )}
 
                 {/* Action */}
                 <TableCell className="py-2">

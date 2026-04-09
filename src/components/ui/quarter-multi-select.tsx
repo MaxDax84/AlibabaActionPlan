@@ -52,14 +52,16 @@ export function QuarterMultiSelect({
   }, [open])
 
   // Recalculate position on open
+  const DROPDOWN_H = 180 // approx height of 4 quarter options
+
   const handleOpen = () => {
     if (triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect()
-      setCoords({
-        top: rect.bottom + window.scrollY + 4,
-        left: rect.left + window.scrollX,
-        width: Math.max(rect.width, 100),
-      })
+      const spaceBelow = window.innerHeight - rect.bottom
+      const top = spaceBelow >= DROPDOWN_H
+        ? rect.bottom + window.scrollY + 4          // open below
+        : rect.top + window.scrollY - DROPDOWN_H - 4 // flip above
+      setCoords({ top, left: rect.left + window.scrollX, width: Math.max(rect.width, 100) })
     }
     setOpen(o => !o)
   }

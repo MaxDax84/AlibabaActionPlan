@@ -4,12 +4,13 @@ import { useState, useMemo } from 'react'
 import { useActions, useFilteredActions } from '@/hooks/useActions'
 import { FilterState, Action } from '@/lib/types'
 import { ActionTable } from '@/components/action-table/ActionTable'
+import { GroupedActionTable } from '@/components/action-table/GroupedActionTable'
 import { AddActionDialog } from '@/components/dialogs/AddActionDialog'
 import { FilterBar } from '@/components/filters/FilterBar'
 import { VersionHistory } from '@/components/VersionHistory'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Plus, Download, Archive, ClipboardList, Loader2 } from 'lucide-react'
+import { Plus, Download, Archive, ClipboardList, Loader2, LayoutList, Layers } from 'lucide-react'
 import { toast } from 'sonner'
 import { exportToExcel } from '@/lib/export'
 import { Toaster } from 'sonner'
@@ -24,6 +25,7 @@ const defaultFilters: FilterState = {
 
 export default function Home() {
   const [tab, setTab] = useState<'active' | 'archive'>('active')
+  const [grouped, setGrouped] = useState(true)
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [filters, setFilters] = useState<FilterState>(defaultFilters)
   const [exporting, setExporting] = useState(false)
@@ -112,6 +114,16 @@ export default function Home() {
               <Button
                 variant="outline"
                 size="sm"
+                onClick={() => setGrouped(g => !g)}
+                className="h-9 gap-1.5"
+                title={grouped ? 'Switch to flat list' : 'Switch to grouped by stage'}
+              >
+                {grouped ? <LayoutList className="h-4 w-4" /> : <Layers className="h-4 w-4" />}
+                <span className="hidden sm:inline">{grouped ? 'Flat' : 'Grouped'}</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleExport}
                 disabled={exporting || filteredActions.length === 0}
                 className="h-9 gap-1.5"
@@ -187,23 +199,31 @@ export default function Home() {
             ) : (
               <>
                 <TabsContent value="active" className="m-0">
-                  <div className="p-1">
-                    <ActionTable
+                  {grouped ? (
+                    <GroupedActionTable
                       actions={filteredActions}
                       onUpdate={handleUpdate}
                       onDelete={handleDelete}
                     />
-                  </div>
+                  ) : (
+                    <div className="p-1">
+                      <ActionTable actions={filteredActions} onUpdate={handleUpdate} onDelete={handleDelete} />
+                    </div>
+                  )}
                 </TabsContent>
                 <TabsContent value="archive" className="m-0">
-                  <div className="p-1">
-                    <ActionTable
+                  {grouped ? (
+                    <GroupedActionTable
                       actions={filteredActions}
                       onUpdate={handleUpdate}
                       onDelete={handleDelete}
                       showArchived
                     />
-                  </div>
+                  ) : (
+                    <div className="p-1">
+                      <ActionTable actions={filteredActions} onUpdate={handleUpdate} onDelete={handleDelete} showArchived />
+                    </div>
+                  )}
                 </TabsContent>
               </>
             )}

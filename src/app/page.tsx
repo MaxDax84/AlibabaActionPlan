@@ -89,11 +89,11 @@ export default function Home() {
   }), [actions])
 
   return (
-    <div className="h-screen flex flex-col bg-slate-50 overflow-hidden">
+    <div className="min-h-screen bg-slate-50">
       <Toaster position="top-right" richColors />
 
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 shrink-0 z-40">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
@@ -133,7 +133,7 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-hidden flex flex-col max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-6">
@@ -152,7 +152,7 @@ export default function Home() {
         </div>
 
         {/* Tabs */}
-        <Tabs value={tab} onValueChange={v => { setTab(v as 'active' | 'archive'); setFilters(defaultFilters) }} className="flex-1 flex flex-col overflow-hidden">
+        <Tabs value={tab} onValueChange={v => { setTab(v as 'active' | 'archive'); setFilters(defaultFilters) }}>
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
             <TabsList className="self-start">
               <TabsTrigger value="active" className="gap-1.5">
@@ -179,14 +179,14 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-hidden bg-white rounded-lg border border-slate-200 flex flex-col">
+          <div className="bg-white rounded-lg border border-slate-200">
             {loading ? (
-              <div className="flex items-center justify-center flex-1">
+              <div className="flex items-center justify-center py-16">
                 <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
               </div>
             ) : (
               <>
-                <TabsContent value="active" className="m-0 flex-1 overflow-auto">
+                <TabsContent value="active" className="m-0">
                   <div className="p-1">
                     <ActionTable
                       actions={filteredActions}
@@ -195,7 +195,7 @@ export default function Home() {
                     />
                   </div>
                 </TabsContent>
-                <TabsContent value="archive" className="m-0 flex-1 overflow-auto">
+                <TabsContent value="archive" className="m-0">
                   <div className="p-1">
                     <ActionTable
                       actions={filteredActions}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import * as Portal from '@radix-ui/react-portal'
 import { FilterState, Action } from '@/lib/types'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -32,20 +33,25 @@ function OwnerFilter({
 }) {
   const [open, setOpen] = useState(false)
   const [text, setText] = useState(value === 'all' ? '' : value)
-  const ref = useRef<HTMLDivElement>(null)
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 })
+  const wrapperRef = useRef<HTMLDivElement>(null)
 
-  // Sync external clear
   useEffect(() => {
     if (value === 'all') setText('')
   }, [value])
 
   useEffect(() => {
+    if (!open) return
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+      const portal = document.getElementById('owner-filter-portal')
+      if (
+        wrapperRef.current && !wrapperRef.current.contains(e.target as Node) &&
+        !(portal && portal.contains(e.target as Node))
+      ) setOpen(false)
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
-  }, [])
+  }, [open])
 
   const filtered = owners.filter(o => o.toLowerCase().includes(text.toLowerCase()))
 
@@ -55,31 +61,37 @@ function OwnerFilter({
     setOpen(false)
   }
 
+  const handleFocus = () => {
+    if (wrapperRef.current) {
+      const rect = wrapperRef.current.getBoundingClientRect()
+      setCoords({ top: rect.bottom + window.scrollY + 4, left: rect.left + window.scrollX, width: rect.width })
+    }
+    setOpen(true)
+  }
+
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value)
     onChange(e.target.value || 'all')
     setOpen(true)
   }
 
-  const handleKey = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') { setOpen(false) }
-    if (e.key === 'Enter') { setOpen(false) }
-  }
-
   return (
-    <div ref={ref} className="relative w-[150px]">
+    <div ref={wrapperRef} className="relative w-[150px]">
       <div className="relative">
         <Input
           placeholder="Owner..."
           value={text}
           onChange={handleInput}
-          onFocus={() => setOpen(true)}
-          onKeyDown={handleKey}
+          onFocus={handleFocus}
+          onKeyDown={e => { if (e.key === 'Escape' || e.key === 'Enter') setOpen(false) }}
           className="h-9 pr-7 text-sm"
         />
         <button
           type="button"
-          onClick={() => setOpen(o => !o)}
+          onClick={() => {
+            handleFocus()
+            setOpen(o => !o)
+          }}
           className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
         >
           <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', open && 'rotate-180')} />
@@ -87,42 +99,32 @@ function OwnerFilter({
       </div>
 
       {open && (
-        <div className="absolute z-50 mt-1 left-0 w-full bg-white border border-slate-200 rounded-md shadow-lg py-1 max-h-48 overflow-y-auto">
-          <button
-            type="button"
-            onClick={() => apply('all')}
-            className={cn(
-              'flex items-center gap-2 w-full px-3 py-1.5 text-sm hover:bg-slate-50 transition-colors text-slate-500',
-              value === 'all' && 'font-semibold text-slate-700'
-            )}
+        <Portal.Root>
+          <div
+            id="owner-filter-portal"
+            style={{ position: 'absolute', top: coords.top, left: coords.left, width: coords.width, zIndex: 9999 }}
+            className="bg-white border border-slate-200 rounded-md shadow-lg py-1 max-h-48 overflow-y-auto"
           >
-            All Owners
-          </button>
-          {filtered.map(o => (
-            <button
-              key={o}
-              type="button"
-              onClick={() => apply(o)}
-              className={cn(
-                'flex items-center justify-between w-full px-3 py-1.5 text-sm hover:bg-slate-50 transition-colors',
-                value === o && 'bg-slate-50 font-semibold'
-              )}
-            >
-              {o}
-              {value === o && <Check className="h-3.5 w-3.5 text-blue-500" />}
+            <button type="button" onClick={() => apply('all')}
+              className={cn('flex items-center gap-2 w-full px-3 py-1.5 text-sm hover:bg-slate-50 text-slate-500', value === 'all' && 'font-semibold text-slate-700')}>
+              All Owners
             </button>
-          ))}
-          {text && !owners.includes(text) && (
-            <button
-              type="button"
-              onClick={() => apply(text)}
-              className="flex items-center gap-2 w-full px-3 py-1.5 text-sm hover:bg-slate-50 text-blue-600 border-t border-slate-100"
-            >
-              <Search className="h-3 w-3" />
-              Search "{text}"
-            </button>
-          )}
-        </div>
+            {filtered.map(o => (
+              <button key={o} type="button" onClick={() => apply(o)}
+                className={cn('flex items-center justify-between w-full px-3 py-1.5 text-sm hover:bg-slate-50', value === o && 'bg-slate-50 font-semibold')}>
+                {o}
+                {value === o && <Check className="h-3.5 w-3.5 text-blue-500" />}
+              </button>
+            ))}
+            {text && !owners.includes(text) && (
+              <button type="button" onClick={() => apply(text)}
+                className="flex items-center gap-2 w-full px-3 py-1.5 text-sm hover:bg-slate-50 text-blue-600 border-t border-slate-100">
+                <Search className="h-3 w-3" />
+                Search "{text}"
+              </button>
+            )}
+          </div>
+        </Portal.Root>
       )}
     </div>
   )

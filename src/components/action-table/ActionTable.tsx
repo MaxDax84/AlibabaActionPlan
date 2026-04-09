@@ -182,9 +182,9 @@ export function ActionTable({ actions, onUpdate, onDelete, showArchived = false 
   }
 
   return (
-    <div className="rounded-md border border-slate-200 overflow-hidden">
+    <div className="rounded-md border border-slate-200">
       <Table>
-        <TableHeader className="sticky top-0 z-10">
+        <TableHeader>
           <TableRow className="bg-slate-50 hover:bg-slate-50">
             <TableHead className="w-[170px] font-semibold text-slate-700">Stage</TableHead>
             <TableHead className="font-semibold text-slate-700">Action</TableHead>

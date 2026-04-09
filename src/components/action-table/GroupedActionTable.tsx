@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Action } from '@/lib/types'
-import { STAGE_COLORS, STAGE_DOT_COLORS, STAGES } from '@/lib/constants'
+import { STAGE_COLORS, STAGE_DOT_COLORS, STAGE_HEADER_BG, STAGES } from '@/lib/constants'
 import { ActionRow, FADE_DURATION } from './ActionRow'
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table'
 import { ChevronDown, ChevronRight } from 'lucide-react'
@@ -76,7 +76,11 @@ export function GroupedActionTable({ actions, onUpdate, onDelete, showArchived =
             <TableBody key={stage}>
               {/* Stage group header row */}
               <TableRow
-                className="bg-slate-50/80 hover:bg-slate-100/60 cursor-pointer select-none border-t border-slate-200"
+                className={cn(
+                  'cursor-pointer select-none border-t',
+                  STAGE_HEADER_BG[stage] || 'bg-slate-100 border-slate-200',
+                  'hover:brightness-95'
+                )}
                 onClick={() => toggleCollapse(stage)}
               >
                 <TableCell colSpan={COLS} className="py-2 px-4">

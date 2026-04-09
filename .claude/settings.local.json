@@ -18,7 +18,19 @@
       "Bash(npm list:*)",
       "Bash(rm:*)",
       "Bash(npx shadcn@latest add popover --yes)",
-      "WebFetch(domain:alidocs.dingtalk.com)"
+      "WebFetch(domain:alidocs.dingtalk.com)",
+      "WebFetch(domain:docs.google.com)",
+      "WebFetch(domain:doc-00-90-docstext.googleusercontent.com)",
+      "Bash(curl -s -L \"https://docs.google.com/document/d/1RlyDggYiavKkZEp5WD81o5mAELyDLP_CCpQKh6jSqGs/export?format=html\" -o \"/tmp/alibaba_doc.html\")",
+      "Read(//tmp/**)",
+      "Bash(python3.exe --version)",
+      "Bash(python.exe --version)",
+      "Bash(py --version)",
+      "Bash(where python:*)",
+      "Bash(where py:*)",
+      "Bash(py:*)",
+      "Bash(curl -s -L \"https://docs.google.com/document/d/1RlyDggYiavKkZEp5WD81o5mAELyDLP_CCpQKh6jSqGs/export?format=html\" -o \"C:/Users/Massimo/AppData/Local/Temp/alibaba_doc.html\")",
+      "Read(//c/Users/Massimo/AppData/Local/Temp/**)"
     ]
   }
 }

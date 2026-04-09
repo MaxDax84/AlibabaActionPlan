@@ -32,3 +32,10 @@ export const STAGE_DOT_COLORS: Record<string, string> = {
   'New Customer Acquisition & Policy':         'bg-green-400',
   'Customer Success, Buyers & Gov Projects':   'bg-purple-400',
 }
+
+export const STAGE_HEADER_BG: Record<string, string> = {
+  'Business Analysis & Platform':              'bg-cyan-100 border-cyan-200',
+  'Lead Generation & Shopify Strategy':        'bg-blue-100 border-blue-200',
+  'New Customer Acquisition & Policy':         'bg-green-100 border-green-200',
+  'Customer Success, Buyers & Gov Projects':   'bg-purple-100 border-purple-200',
+}

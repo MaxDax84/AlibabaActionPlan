@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Action } from '@/lib/types'
-import { STAGES, QUARTERS } from '@/lib/constants'
+import { STAGES } from '@/lib/constants'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { QuarterMultiSelect } from '@/components/ui/quarter-multi-select'
 
 interface AddActionDialogProps {
   open: boolean
@@ -88,15 +89,12 @@ export function AddActionDialog({ open, onClose, onAdd }: AddActionDialogProps) 
               {errors.stage && <p className="text-xs text-red-500">{errors.stage}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="quarter">Impact Quarter</Label>
-              <Select value={formData.impact_quarter} onValueChange={v => setFormData(p => ({ ...p, impact_quarter: v }))}>
-                <SelectTrigger id="quarter">
-                  <SelectValue placeholder="Select quarter" />
-                </SelectTrigger>
-                <SelectContent>
-                  {QUARTERS.map(q => <SelectItem key={q} value={q}>{q}</SelectItem>)}
-                </SelectContent>
-              </Select>
+              <Label>Impact Quarter</Label>
+              <QuarterMultiSelect
+                value={formData.impact_quarter}
+                onChange={v => setFormData(p => ({ ...p, impact_quarter: v }))}
+                placeholder="Select quarters"
+              />
             </div>
           </div>
 

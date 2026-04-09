@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { Action } from '@/lib/types'
-import { STAGE_COLORS, QUARTERS, STAGES } from '@/lib/constants'
+import { STAGE_COLORS, STAGES } from '@/lib/constants'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Trash2, ArchiveRestore, Check } from 'lucide-react'
@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { QuarterMultiSelect, parseQuarters } from '@/components/ui/quarter-multi-select'
 import {
   Table,
   TableBody,
@@ -213,23 +214,17 @@ export function ActionTable({ actions, onUpdate, onDelete, showArchived = false 
                 {/* Quarter */}
                 <TableCell className="py-2">
                   {showArchived ? (
-                    action.impact_quarter && (
-                      <Badge variant="secondary" className="text-xs">{action.impact_quarter}</Badge>
-                    )
+                    <div className="flex flex-wrap gap-1">
+                      {parseQuarters(action.impact_quarter).map(q => (
+                        <Badge key={q} variant="secondary" className="text-xs px-1.5 py-0">{q}</Badge>
+                      ))}
+                    </div>
                   ) : (
-                    <Select
+                    <QuarterMultiSelect
                       value={action.impact_quarter || ''}
-                      onValueChange={v => onUpdate(action.id, { impact_quarter: v })}
-                    >
-                      <SelectTrigger className="h-7 w-[76px] text-xs border-transparent hover:border-slate-200 focus:border-slate-300 shadow-none px-2">
-                        <SelectValue placeholder="—" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {QUARTERS.map(q => (
-                          <SelectItem key={q} value={q} className="text-xs">{q}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      onChange={v => onUpdate(action.id, { impact_quarter: v })}
+                      inline
+                    />
                   )}
                 </TableCell>
 

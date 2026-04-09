@@ -21,7 +21,9 @@ interface FilterBarProps {
 
 export function FilterBar({ filters, onFiltersChange, actions }: FilterBarProps) {
   const owners = Array.from(new Set(actions.map(a => a.owner))).filter(Boolean).sort()
-  const quarters = Array.from(new Set(actions.map(a => a.impact_quarter))).filter(Boolean).sort()
+  const quarters = Array.from(new Set(
+    actions.flatMap(a => a.impact_quarter ? a.impact_quarter.split(',').map(q => q.trim()) : [])
+  )).filter(Boolean).sort()
   const stages = Array.from(new Set(actions.map(a => a.stage))).filter(Boolean).sort()
 
   const update = (key: keyof FilterState, value: string) => {

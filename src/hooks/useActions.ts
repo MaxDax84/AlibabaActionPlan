@@ -136,7 +136,11 @@ export function useFilteredActions(actions: Action[], filters: FilterState, arch
   return actions.filter(action => {
     if (action.archived !== archived) return false
     if (filters.owner && filters.owner !== 'all' && action.owner !== filters.owner) return false
-    if (filters.quarter && filters.quarter !== 'all' && action.impact_quarter !== filters.quarter) return false
+    if (filters.quarter && filters.quarter !== 'all') {
+      // action may have multiple quarters stored as "Q1,Q3"
+      const actionQuarters = action.impact_quarter ? action.impact_quarter.split(',').map(q => q.trim()) : []
+      if (!actionQuarters.includes(filters.quarter)) return false
+    }
     if (filters.stage && filters.stage !== 'all' && action.stage !== filters.stage) return false
     if (filters.status === 'done' && !action.status) return false
     if (filters.status === 'pending' && action.status) return false

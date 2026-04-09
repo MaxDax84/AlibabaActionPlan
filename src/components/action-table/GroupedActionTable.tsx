@@ -56,7 +56,7 @@ export function GroupedActionTable({ actions, onUpdate, onDelete, showArchived =
     // Single table — one header, all groups share column widths
     <div className="rounded-md border border-slate-200 overflow-visible">
       <Table>
-        <TableHeader className="sticky top-16 z-10">
+        <TableHeader className="sticky top-16 z-10 bg-slate-50 shadow-sm">
           <TableRow className="bg-slate-50 hover:bg-slate-50">
             <TableHead className="font-semibold text-slate-700">Action</TableHead>
             <TableHead className="w-[120px] font-semibold text-slate-700">Owner</TableHead>

@@ -1,19 +1,12 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Action } from '@/lib/types'
 import { STAGE_COLORS, STAGES } from '@/lib/constants'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Trash2, ArchiveRestore, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { QuarterMultiSelect, parseQuarters } from '@/components/ui/quarter-multi-select'
 import {
   Table,
@@ -109,6 +102,72 @@ function InlineText({
   )
 }
 
+// Inline stage selector — looks like a badge, opens dropdown on click
+function InlineStage({ value, onSave }: { value: string; onSave: (v: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  return (
+    <div ref={ref} className="relative inline-block">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        title="Click to change stage"
+        className="focus:outline-none"
+      >
+        <Badge
+          variant="outline"
+          className={cn(
+            'text-xs font-medium whitespace-nowrap cursor-pointer',
+            'hover:opacity-80 transition-opacity',
+            STAGE_COLORS[value] || 'bg-slate-100 text-slate-700'
+          )}
+        >
+          {value}
+        </Badge>
+      </button>
+
+      {open && (
+        <div className="absolute z-50 mt-1 left-0 bg-white border border-slate-200 rounded-md shadow-lg py-1 min-w-[180px]">
+          {STAGES.map(s => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => { onSave(s); setOpen(false) }}
+              className={cn(
+                'flex items-center gap-2 w-full px-3 py-1.5 text-xs hover:bg-slate-50 transition-colors text-left',
+                s === value && 'font-semibold'
+              )}
+            >
+              <span className={cn(
+                'inline-block w-2 h-2 rounded-full shrink-0',
+                STAGE_COLORS[s]?.includes('blue') ? 'bg-blue-400' :
+                STAGE_COLORS[s]?.includes('green') ? 'bg-green-400' :
+                STAGE_COLORS[s]?.includes('purple') ? 'bg-purple-400' :
+                STAGE_COLORS[s]?.includes('orange') ? 'bg-orange-400' :
+                STAGE_COLORS[s]?.includes('pink') ? 'bg-pink-400' :
+                STAGE_COLORS[s]?.includes('yellow') ? 'bg-yellow-400' :
+                STAGE_COLORS[s]?.includes('teal') ? 'bg-teal-400' :
+                STAGE_COLORS[s]?.includes('indigo') ? 'bg-indigo-400' :
+                STAGE_COLORS[s]?.includes('red') ? 'bg-red-400' : 'bg-slate-400'
+              )} />
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function ActionTable({ actions, onUpdate, onDelete, showArchived = false }: ActionTableProps) {
   const [fadingIds, setFadingIds] = useState<Set<string>>(new Set())
 
@@ -172,30 +231,24 @@ export function ActionTable({ actions, onUpdate, onDelete, showArchived = false 
                       {action.stage}
                     </Badge>
                   ) : (
-                    <Select
+                    <InlineStage
                       value={action.stage}
-                      onValueChange={v => onUpdate(action.id, { stage: v })}
-                    >
-                      <SelectTrigger className="h-7 text-xs border-transparent hover:border-slate-200 focus:border-slate-300 shadow-none px-1 w-full">
-                        <Badge
-                          variant="outline"
-                          className={cn('text-xs font-medium whitespace-nowrap pointer-events-none', STAGE_COLORS[action.stage] || 'bg-slate-100 text-slate-700')}
-                        >
-                          {action.stage}
-                        </Badge>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {STAGES.map(s => (
-                          <SelectItem key={s} value={s} className="text-xs">{s}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      onSave={v => onUpdate(action.id, { stage: v })}
+                    />
                   )}
                 </TableCell>
 
-                {/* Action (read-only) */}
+                {/* Action */}
                 <TableCell className="py-2">
-                  <span className="text-sm text-slate-800">{action.action_list}</span>
+                  {showArchived ? (
+                    <span className="text-sm text-slate-800">{action.action_list}</span>
+                  ) : (
+                    <InlineText
+                      value={action.action_list}
+                      onSave={v => onUpdate(action.id, { action_list: v })}
+                      multiline
+                    />
+                  )}
                 </TableCell>
 
                 {/* Owner */}

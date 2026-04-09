@@ -1,124 +1,82 @@
 -- ============================================================
--- SEED: Action Plan — full historical table
--- Run in Supabase SQL Editor to replace all existing actions
+-- SEED — run in Supabase SQL Editor
+-- Replaces all existing actions with the imported dataset
 -- ============================================================
-
--- Clear existing actions (versions are preserved)
 DELETE FROM actions;
 
--- ─── Business Analysis ───────────────────────────────────────
 INSERT INTO actions (stage, action_list, owner, impact_quarter, kpi, status, archived) VALUES
+
 ('Business Analysis',
- 'Dashboard, traffic analysis, ICP review target',
- 'Boyu', '', '', false, false);
+ 'Dashboard, traffic analysis, iCP review target',
+ 'Boyu', 'Q1', 'Analysis completed',
+ false, false),
 
--- ─── ICP Operation ───────────────────────────────────────────
-INSERT INTO actions (stage, action_list, owner, impact_quarter, kpi, status, archived) VALUES
-('ICP Operation',
+('ICP Operation & Mid Platform Resources/Traffic',
  'Green Path Push and new Push/EDM mechanism product launches — performance monitoring & strategic iteration',
- 'Boyu', '', '', false, false),
-('ICP Operation',
+ 'Boyu', 'Q1', 'Conversion rate increase',
+ false, false),
+
+('ICP Operation & Mid Platform Resources/Traffic',
  'Search & Recommendation weighting experiments — performance analysis & iterative strategy optimization',
- 'Boyu', '', '', false, false);
-
--- ─── Lead Generation ─────────────────────────────────────────
-INSERT INTO actions (stage, action_list, owner, impact_quarter, kpi, status, archived) VALUES
-('Lead Generation',
- 'Lead affiliate partnerships (Associations of core categories per ICP, Unespain for Spain)',
- 'Arianna', 'Q1', '#of Qualified Leads shared to DS team', false, false),
+ 'Boyu', 'Q1', 'Search relevance score',
+ false, false),
 
 ('Lead Generation',
- 'Shopify EU integration: postpone post-US launch. Keep May requests, evaluate after Accio Work priorities. Possible EU rollout June.',
- 'Karl/Arianna', 'TBC', '', false, false),
+ 'Lead affiliate partnerships (main focus: Associations of core categories according to ICP, Unespain for Spain)',
+ 'Arianna', 'Q1', '# of Qualified Leads shared',
+ false, false),
 
 ('Lead Generation',
  'Develop Lead Base for Upselling via Shopify implementation',
- 'Karl/Arianna', 'TBC', '#Free TS, #Orders', false, false),
+ 'Karl / Arianna', 'TBC', '# Free TS, # Orders',
+ false, false),
 
-('Lead Generation',
- 'Focus Shopify user communication on Alibaba.com ICP',
- 'Karl/Arianna', 'TBC', '', false, false),
-
-('Lead Generation',
- 'Collaborate to ensure proper translations of funnel and Payoneer for TA',
- 'Karl/Arianna', 'TBC', '', false, false),
-
-('Lead Generation',
- 'Tiers with ICP',
- 'Jinjin', 'Q1', '', false, false),
-
-('Lead Generation',
- 'New landing page',
- 'Jinjin', 'Q1', '', false, false),
-
-('Lead Generation',
- 'AI enrichment tool',
- 'Jinjin', 'Q1', '', false, false),
-
-('Lead Generation',
- 'Collaboration with Marketing Team on Tradeshows',
- 'Jinjin', 'FY27', '', false, false);
-
--- ─── New Customer Acquisition ────────────────────────────────
-INSERT INTO actions (stage, action_list, owner, impact_quarter, kpi, status, archived) VALUES
-('New Customer Acquisition',
+('New Customers Acquisition',
  'Handover of Channels from Franci to Ana',
- 'Arianna', 'Q1', '#of New Sign; Cash Revenue, Revenue', true, true),
+ 'Arianna', 'Q1', 'Handover completed',
+ true, true),
 
-('New Customer Acquisition',
- 'Reseller partnership in Italy and Spain / Recovery of partnerships renewed in PT',
- 'Arianna', 'Q1', '#of Newly Signed Contracts', false, false),
+('New Customers Acquisition',
+ 'Working on reseller partnership in Italy and Spain / Recovery of partnerships renewed in PT',
+ 'Arianna', 'Q1', '# of New Sign; Cash Revenue',
+ false, false),
 
-('New Customer Acquisition',
- 'Amended contract (changes agreed Feb; amendment solicited to Borui Mar)',
- 'Arianna', 'Q1', 'n.a.', false, false),
+('New Customers Acquisition',
+ 'Amended contract (Agreed on changes in Feb; solicited to Borui the amendment to contract in Mar)',
+ 'Arianna', 'Q1', '# of Newly Signed Contracts',
+ false, false),
 
-('New Customer Acquisition',
- 'Payment resolution (discussed Feb w/ Ella; follow-up on solutions Mar)',
- 'Arianna', 'TBC', 'n.a.', false, false),
+('New Customers Acquisition',
+ 'Commission policy re-definition',
+ 'Jinjin', 'Q1', 'Policy approved',
+ true, true),
 
-('New Customer Acquisition',
- 'Commission policy',
- 'Jinjin', 'Q1', '', true, true),
+('New Customers Acquisition',
+ 'Commercial products (Packages, Guaranteed ads, KSP)',
+ 'Jinjin', 'Q1', 'Product launch',
+ true, true),
 
-('New Customer Acquisition',
- 'Compensation for consumption from FY26',
- 'Jinjin', 'Q1', '', true, true),
-
-('New Customer Acquisition',
- 'Commercial products: Packages, Guaranteed ads, KSP',
- 'Jinjin', 'Q1', '', false, false),
-
-('New Customer Acquisition',
- 'Target assignment',
- 'Jinjin', 'FY27', '', false, false);
-
--- ─── Customer Success ────────────────────────────────────────
-INSERT INTO actions (stage, action_list, owner, impact_quarter, kpi, status, archived) VALUES
-('Customer Success',
- 'New structure per channel: different tasks and priorities based on channel situation (KWA Consumption, KWA Top-Up, TA Activation)',
- 'Arianna', 'Q1', 'Revenue, Renewal Rate', false, false);
-
--- ─── Buyers ──────────────────────────────────────────────────
-INSERT INTO actions (stage, action_list, owner, impact_quarter, kpi, status, archived) VALUES
-('Buyers',
- 'Leverage channels for targeted buyer acquisition: Revolut Business (Accio Work benefit) — PENDING, Italian partner buyer acquirer — PENDING, EU players (Atradius, IFEMA, VISA) — negotiations ongoing',
- 'Arianna', 'Q2', '#of Buyers', false, false),
+('Customer Success & Account Management',
+ 'Working with Ana on new structure per channel pushing different tasks and priorities (e.g. KWA Consumption, KWA Top-Up, TA Activation..)',
+ 'Arianna', 'Q1', 'Revenue, Renewals',
+ false, false),
 
 ('Buyers',
- 'Pilot B2B and B2B2C buyer acquisition model: Unespain proposal — IN PROGRESS, multiple EU industry players — IN PROGRESS',
- 'Arianna', 'Q2', '#of Buyers', false, false);
-
--- ─── Gov. Project ────────────────────────────────────────────
-INSERT INTO actions (stage, action_list, owner, impact_quarter, kpi, status, archived) VALUES
-('Gov. Project',
- 'ICE Italy: conditions agreed (DONE), closing old commission issue (IN PROGRESS), start activity on 303 ICE3 clients 94.5% expired pool (PENDING)',
- 'Arianna', 'Q1', 'Cash Revenue (Q1), Revenue (Q2)', false, false),
+ 'Leverage channels for targeted buyer acquisition (Shared proposal to Revolut Business, Italian partner, advanced negotiation with EU player Atradius, IFEMA, VISA)',
+ 'Arianna', 'Q2', '# of Buyers',
+ false, false),
 
 ('Gov. Project',
- 'ICEX Spain: align with Giusy and Sylvia to secure remaining payments (60%)',
- 'Arianna', 'Q1', 'Cash Revenue and Revenue (Q1)', false, false),
+ 'ICE (Italy): Agreed on ICE3 conditions (DONE); Closing old commission issue (IN PROGRESS); Start activity on 303 ICE 3 clients (PENDING)',
+ 'Arianna', 'Q1', 'Cash Revenue (Q1)',
+ false, false),
 
 ('Gov. Project',
- 'Business France: BF1/BF service criticalities, Visable involvement review, new ICP/SOP alignment, BF2 SOP, new POC for payments, process ~26 client payments',
- 'Arianna', 'Q1', 'Cash Revenue and Revenue (Q1)', false, false);
+ 'ICEX (Spain): Align with Giusy and Sylvia to secure remaining payments (60%)',
+ 'Arianna', 'Q1', 'Cash Revenue',
+ false, false),
+
+('Gov. Project',
+ 'BUSINESS FRANCE (France): Align with Sylvia on BF1 and BF service criticalities (DONE); Review Visable involvement',
+ 'Arianna', 'Q1', 'Cash Revenue',
+ false, false);

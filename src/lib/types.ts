@@ -1,33 +1,29 @@
 export interface Action {
   id: string
-  stage: string
+  task_id: string
+  domain: string
+  stage: string        // = Section (Business Analysis & Platform, etc.)
   action_list: string
   owner: string
-  impact_quarter: string
-  kpi: string
+  kpi: string          // displayed as "Metric" in UI
   status: boolean
   archived: boolean
   created_at: string
   updated_at: string
+  // kept in DB for backward compat, not shown in UI
+  impact_quarter?: string
 }
 
 export interface ActionVersion {
   id: string
-  action_id: string
-  stage: string
-  action_list: string
-  owner: string
-  impact_quarter: string
-  kpi: string
-  status: boolean
-  archived: boolean
-  saved_at: string
+  snapshot: unknown[]
   version_label: string
+  saved_at: string
 }
 
 export type FilterState = {
   owner: string
-  quarter: string
+  domain: string
   stage: string
   status: string
   search: string

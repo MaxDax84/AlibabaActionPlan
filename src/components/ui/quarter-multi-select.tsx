@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import * as Portal from '@radix-ui/react-portal'
-import { QUARTERS } from '@/lib/constants'
+const QUARTERS = ['Q1', 'Q2', 'Q3', 'Q4', 'FY27', 'TBC']
 import { Badge } from '@/components/ui/badge'
 import { Check, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'

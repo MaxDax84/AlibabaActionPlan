@@ -15,7 +15,7 @@ interface GroupedActionTableProps {
   showArchived?: boolean
 }
 
-const COLS = 6 // Action + Owner + Quarter + KPI + Done + Delete
+const COLS = 7 // Task ID + Domain + Action Plan + Owner + Metric + Done + Delete
 
 export function GroupedActionTable({ actions, onUpdate, onDelete, showArchived = false }: GroupedActionTableProps) {
   const [fadingIds, setFadingIds] = useState<Set<string>>(new Set())
@@ -58,10 +58,11 @@ export function GroupedActionTable({ actions, onUpdate, onDelete, showArchived =
       <Table>
         <TableHeader className="sticky top-16 z-10 bg-slate-50 shadow-sm">
           <TableRow className="bg-slate-50 hover:bg-slate-50">
-            <TableHead className="font-semibold text-slate-700">Action</TableHead>
+            <TableHead className="w-[90px] font-semibold text-slate-700">Task ID</TableHead>
+            <TableHead className="w-[130px] font-semibold text-slate-700">Domain</TableHead>
+            <TableHead className="font-semibold text-slate-700">Action Plan</TableHead>
             <TableHead className="w-[120px] font-semibold text-slate-700">Owner</TableHead>
-            <TableHead className="font-semibold text-slate-700">Quarter</TableHead>
-            <TableHead className="w-[220px] font-semibold text-slate-700">KPI</TableHead>
+            <TableHead className="w-[220px] font-semibold text-slate-700">Metric</TableHead>
             <TableHead className="w-[70px] text-center font-semibold text-slate-700">Done</TableHead>
             <TableHead className="w-[50px]"></TableHead>
           </TableRow>
@@ -107,7 +108,6 @@ export function GroupedActionTable({ actions, onUpdate, onDelete, showArchived =
                   onUpdate={onUpdate}
                   onDelete={onDelete}
                   showArchived={showArchived}
-                  showStageColumn={false}
                   isFading={fadingIds.has(action.id)}
                   onDone={() => handleDone(action.id)}
                 />

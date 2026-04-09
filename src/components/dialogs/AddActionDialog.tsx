@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Action } from '@/lib/types'
-import { STAGES } from '@/lib/constants'
+import { STAGES, DOMAINS } from '@/lib/constants'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -22,7 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { QuarterMultiSelect } from '@/components/ui/quarter-multi-select'
 
 interface AddActionDialogProps {
   open: boolean
@@ -32,10 +31,11 @@ interface AddActionDialogProps {
 
 export function AddActionDialog({ open, onClose, onAdd }: AddActionDialogProps) {
   const [formData, setFormData] = useState({
+    task_id: '',
     stage: '',
+    domain: '',
     action_list: '',
     owner: '',
-    impact_quarter: '',
     kpi: '',
     status: false,
   })
@@ -44,8 +44,8 @@ export function AddActionDialog({ open, onClose, onAdd }: AddActionDialogProps) 
 
   const validate = () => {
     const errs: Record<string, string> = {}
-    if (!formData.stage) errs.stage = 'Stage is required'
-    if (!formData.action_list.trim()) errs.action_list = 'Action is required'
+    if (!formData.stage) errs.stage = 'Section is required'
+    if (!formData.action_list.trim()) errs.action_list = 'Action Plan is required'
     if (!formData.owner.trim()) errs.owner = 'Owner is required'
     setErrors(errs)
     return Object.keys(errs).length === 0
@@ -57,7 +57,7 @@ export function AddActionDialog({ open, onClose, onAdd }: AddActionDialogProps) 
     setLoading(true)
     try {
       await onAdd(formData)
-      setFormData({ stage: '', action_list: '', owner: '', impact_quarter: '', kpi: '', status: false })
+      setFormData({ task_id: '', stage: '', domain: '', action_list: '', owner: '', kpi: '', status: false })
       setErrors({})
       onClose()
     } catch (err) {
@@ -77,10 +77,10 @@ export function AddActionDialog({ open, onClose, onAdd }: AddActionDialogProps) 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="stage">Stage <span className="text-red-500">*</span></Label>
+              <Label htmlFor="stage">Section <span className="text-red-500">*</span></Label>
               <Select value={formData.stage} onValueChange={v => setFormData(p => ({ ...p, stage: v }))}>
                 <SelectTrigger id="stage" className={errors.stage ? 'border-red-500' : ''}>
-                  <SelectValue placeholder="Select stage" />
+                  <SelectValue placeholder="Select section" />
                 </SelectTrigger>
                 <SelectContent>
                   {STAGES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
@@ -89,17 +89,30 @@ export function AddActionDialog({ open, onClose, onAdd }: AddActionDialogProps) 
               {errors.stage && <p className="text-xs text-red-500">{errors.stage}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label>Impact Quarter</Label>
-              <QuarterMultiSelect
-                value={formData.impact_quarter}
-                onChange={v => setFormData(p => ({ ...p, impact_quarter: v }))}
-                placeholder="Select quarters"
-              />
+              <Label htmlFor="domain">Domain</Label>
+              <Select value={formData.domain} onValueChange={v => setFormData(p => ({ ...p, domain: v }))}>
+                <SelectTrigger id="domain">
+                  <SelectValue placeholder="Select domain" />
+                </SelectTrigger>
+                <SelectContent>
+                  {DOMAINS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="action_list">Action <span className="text-red-500">*</span></Label>
+            <Label htmlFor="task_id">Task ID</Label>
+            <Input
+              id="task_id"
+              placeholder="e.g. BA_01"
+              value={formData.task_id}
+              onChange={e => setFormData(p => ({ ...p, task_id: e.target.value }))}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="action_list">Action Plan <span className="text-red-500">*</span></Label>
             <Textarea
               id="action_list"
               placeholder="Describe the action..."
@@ -115,7 +128,7 @@ export function AddActionDialog({ open, onClose, onAdd }: AddActionDialogProps) 
             <Label htmlFor="owner">Owner <span className="text-red-500">*</span></Label>
             <Input
               id="owner"
-              placeholder="e.g. Arianna, Jinjin/Nic"
+              placeholder="e.g. Arianna, Jinjin"
               value={formData.owner}
               onChange={e => setFormData(p => ({ ...p, owner: e.target.value }))}
               className={errors.owner ? 'border-red-500' : ''}
@@ -124,7 +137,7 @@ export function AddActionDialog({ open, onClose, onAdd }: AddActionDialogProps) 
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="kpi">Measurable KPI</Label>
+            <Label htmlFor="kpi">Metric</Label>
             <Textarea
               id="kpi"
               placeholder="Define measurable success criteria..."

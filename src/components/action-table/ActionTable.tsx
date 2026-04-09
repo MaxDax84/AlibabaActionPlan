@@ -10,10 +10,9 @@ interface ActionTableProps {
   onUpdate: (id: string, updates: Partial<Action>) => Promise<void>
   onDelete: (id: string) => Promise<void>
   showArchived?: boolean
-  showStageColumn?: boolean
 }
 
-export function ActionTable({ actions, onUpdate, onDelete, showArchived = false, showStageColumn = true }: ActionTableProps) {
+export function ActionTable({ actions, onUpdate, onDelete, showArchived = false }: ActionTableProps) {
   const [fadingIds, setFadingIds] = useState<Set<string>>(new Set())
 
   const handleDone = (id: string) => {
@@ -39,11 +38,11 @@ export function ActionTable({ actions, onUpdate, onDelete, showArchived = false,
       <Table>
         <TableHeader className="sticky top-16 z-10 bg-slate-50 shadow-sm">
           <TableRow className="bg-slate-50 hover:bg-slate-50">
-            {showStageColumn && <TableHead className="w-[170px] font-semibold text-slate-700">Stage</TableHead>}
-            <TableHead className="font-semibold text-slate-700">Action</TableHead>
+            <TableHead className="w-[90px] font-semibold text-slate-700">Task ID</TableHead>
+            <TableHead className="w-[130px] font-semibold text-slate-700">Domain</TableHead>
+            <TableHead className="font-semibold text-slate-700">Action Plan</TableHead>
             <TableHead className="w-[120px] font-semibold text-slate-700">Owner</TableHead>
-            <TableHead className="font-semibold text-slate-700">Quarter</TableHead>
-            <TableHead className="w-[220px] font-semibold text-slate-700">KPI</TableHead>
+            <TableHead className="w-[220px] font-semibold text-slate-700">Metric</TableHead>
             <TableHead className="w-[70px] text-center font-semibold text-slate-700">Done</TableHead>
             <TableHead className="w-[50px]"></TableHead>
           </TableRow>
@@ -56,7 +55,6 @@ export function ActionTable({ actions, onUpdate, onDelete, showArchived = false,
               onUpdate={onUpdate}
               onDelete={onDelete}
               showArchived={showArchived}
-              showStageColumn={showStageColumn}
               isFading={fadingIds.has(action.id)}
               onDone={() => handleDone(action.id)}
             />

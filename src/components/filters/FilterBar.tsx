@@ -137,19 +137,17 @@ function OwnerFilter({
 
 export function FilterBar({ filters, onFiltersChange, actions }: FilterBarProps) {
   const owners = Array.from(new Set(actions.map(a => a.owner))).filter(Boolean).sort()
-  const quarters = Array.from(new Set(
-    actions.flatMap(a => a.impact_quarter ? a.impact_quarter.split(',').map(q => q.trim()) : [])
-  )).filter(Boolean).sort()
+  const domains = Array.from(new Set(actions.map(a => a.domain))).filter(Boolean).sort()
   const stages = Array.from(new Set(actions.map(a => a.stage))).filter(Boolean).sort()
 
   const update = (key: keyof FilterState, value: string) =>
     onFiltersChange({ ...filters, [key]: value })
 
-  const hasActiveFilters = filters.owner !== 'all' || filters.quarter !== 'all' ||
+  const hasActiveFilters = filters.owner !== 'all' || filters.domain !== 'all' ||
     filters.stage !== 'all' || filters.status !== 'all' || filters.search !== ''
 
   const clearAll = () =>
-    onFiltersChange({ owner: 'all', quarter: 'all', stage: 'all', status: 'all', search: '' })
+    onFiltersChange({ owner: 'all', domain: 'all', stage: 'all', status: 'all', search: '' })
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -164,12 +162,22 @@ export function FilterBar({ filters, onFiltersChange, actions }: FilterBarProps)
       </div>
 
       <Select value={filters.stage} onValueChange={v => update('stage', v)}>
-        <SelectTrigger className="w-[155px] h-9">
-          <SelectValue placeholder="Stage" />
+        <SelectTrigger className="w-[180px] h-9">
+          <SelectValue placeholder="Section" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Stages</SelectItem>
+          <SelectItem value="all">All Sections</SelectItem>
           {stages.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+        </SelectContent>
+      </Select>
+
+      <Select value={filters.domain} onValueChange={v => update('domain', v)}>
+        <SelectTrigger className="w-[140px] h-9">
+          <SelectValue placeholder="Domain" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Domains</SelectItem>
+          {domains.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
         </SelectContent>
       </Select>
 
@@ -178,16 +186,6 @@ export function FilterBar({ filters, onFiltersChange, actions }: FilterBarProps)
         owners={owners}
         onChange={v => update('owner', v)}
       />
-
-      <Select value={filters.quarter} onValueChange={v => update('quarter', v)}>
-        <SelectTrigger className="w-[125px] h-9">
-          <SelectValue placeholder="Quarter" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Quarters</SelectItem>
-          {quarters.map(q => <SelectItem key={q} value={q}>{q}</SelectItem>)}
-        </SelectContent>
-      </Select>
 
       <Select value={filters.status} onValueChange={v => update('status', v)}>
         <SelectTrigger className="w-[125px] h-9">

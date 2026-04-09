@@ -30,10 +30,11 @@ export async function POST(request: NextRequest) {
   const { data, error } = await supabase
     .from('actions')
     .insert([{
+      task_id: body.task_id || '',
       stage: body.stage,
+      domain: body.domain || '',
       action_list: body.action_list,
       owner: body.owner,
-      impact_quarter: body.impact_quarter,
       kpi: body.kpi || '',
       status: body.status || false,
       archived: false,

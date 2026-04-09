@@ -2,12 +2,10 @@
 
 import { useState, useRef } from 'react'
 import { Action } from '@/lib/types'
-import { STAGE_COLORS, STAGE_DOT_COLORS, STAGES } from '@/lib/constants'
-import { Badge } from '@/components/ui/badge'
+import { DOMAINS } from '@/lib/constants'
 import { Button } from '@/components/ui/button'
 import { Trash2, ArchiveRestore, Check } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { QuarterMultiSelect, parseQuarters } from '@/components/ui/quarter-multi-select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { TableCell, TableRow } from '@/components/ui/table'
 import {
@@ -77,23 +75,21 @@ export function InlineText({
   )
 }
 
-export function InlineStage({ value, onSave }: { value: string; onSave: (v: string) => void }) {
+export function InlineDomain({ value, onSave }: { value: string; onSave: (v: string) => void }) {
   const [open, setOpen] = useState(false)
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button type="button" title="Click to change stage" className="focus:outline-none">
-          <Badge variant="outline" className={cn('text-xs font-medium whitespace-nowrap cursor-pointer hover:opacity-75 transition-opacity', STAGE_COLORS[value] || 'bg-slate-100 text-slate-700')}>
-            {value}
-          </Badge>
+        <button type="button" title="Click to change domain"
+          className="text-sm text-slate-700 cursor-pointer rounded px-1 -mx-1 py-0.5 hover:bg-slate-100 transition-colors focus:outline-none whitespace-nowrap">
+          {value || <span className="text-slate-300 italic">—</span>}
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-52 p-1" align="start" side="bottom" sideOffset={4} avoidCollisions>
-        {STAGES.map(s => (
-          <button key={s} type="button" onClick={() => { onSave(s); setOpen(false) }}
-            className={cn('flex items-center gap-2.5 w-full px-3 py-2 text-sm rounded hover:bg-slate-50 transition-colors text-left', s === value && 'bg-slate-50 font-semibold')}>
-            <span className={cn('w-2 h-2 rounded-full shrink-0', STAGE_DOT_COLORS[s] || 'bg-slate-400')} />
-            {s}
+      <PopoverContent className="w-44 p-1" align="start" side="bottom" sideOffset={4} avoidCollisions>
+        {DOMAINS.map(d => (
+          <button key={d} type="button" onClick={() => { onSave(d); setOpen(false) }}
+            className={cn('flex items-center w-full px-3 py-2 text-sm rounded hover:bg-slate-50 transition-colors text-left', d === value && 'bg-slate-50 font-semibold')}>
+            {d}
           </button>
         ))}
       </PopoverContent>
@@ -118,7 +114,6 @@ export function ActionRow({
   onUpdate,
   onDelete,
   showArchived = false,
-  showStageColumn = true,
   isFading,
   onDone,
 }: ActionRowProps) {
@@ -131,17 +126,23 @@ export function ActionRow({
       }}
       className="hover:bg-slate-50/60 align-top"
     >
-      {/* Stage */}
-      {showStageColumn && (
-        <TableCell className="py-2">
-          {showArchived
-            ? <Badge variant="outline" className={cn('text-xs font-medium whitespace-nowrap', STAGE_COLORS[action.stage] || 'bg-slate-100 text-slate-700')}>{action.stage}</Badge>
-            : <InlineStage value={action.stage} onSave={v => onUpdate(action.id, { stage: v })} />
-          }
-        </TableCell>
-      )}
+      {/* Task ID */}
+      <TableCell className="py-2 w-[90px]">
+        {showArchived
+          ? <span className="text-xs font-mono text-slate-500">{action.task_id}</span>
+          : <InlineText value={action.task_id} onSave={v => onUpdate(action.id, { task_id: v })} className="text-xs font-mono text-slate-500" />
+        }
+      </TableCell>
 
-      {/* Action */}
+      {/* Domain */}
+      <TableCell className="py-2 w-[130px]">
+        {showArchived
+          ? <span className="text-sm text-slate-700">{action.domain}</span>
+          : <InlineDomain value={action.domain} onSave={v => onUpdate(action.id, { domain: v })} />
+        }
+      </TableCell>
+
+      {/* Action Plan */}
       <TableCell className="py-2">
         {showArchived
           ? <span className="text-sm text-slate-800">{action.action_list}</span>
@@ -150,23 +151,15 @@ export function ActionRow({
       </TableCell>
 
       {/* Owner */}
-      <TableCell className="py-2">
+      <TableCell className="py-2 w-[120px]">
         {showArchived
           ? <span className="text-sm font-medium text-slate-700">{action.owner}</span>
           : <InlineText value={action.owner} onSave={v => onUpdate(action.id, { owner: v })} className="font-medium" />
         }
       </TableCell>
 
-      {/* Quarter */}
-      <TableCell className="py-2">
-        {showArchived
-          ? <div className="flex flex-wrap gap-1">{parseQuarters(action.impact_quarter).map(q => <Badge key={q} variant="secondary" className="text-xs px-1.5 py-0">{q}</Badge>)}</div>
-          : <QuarterMultiSelect value={action.impact_quarter || ''} onChange={v => onUpdate(action.id, { impact_quarter: v })} inline className="w-full min-w-[80px]" />
-        }
-      </TableCell>
-
-      {/* KPI */}
-      <TableCell className="py-2">
+      {/* Metric */}
+      <TableCell className="py-2 w-[220px]">
         {showArchived
           ? <span className="text-xs text-slate-600">{action.kpi}</span>
           : <InlineText value={action.kpi} onSave={v => onUpdate(action.id, { kpi: v })} className="text-xs text-slate-600" multiline />
@@ -174,7 +167,7 @@ export function ActionRow({
       </TableCell>
 
       {/* Done / Restore */}
-      <TableCell className="py-2 text-center">
+      <TableCell className="py-2 text-center w-[70px]">
         {showArchived ? (
           <Button variant="ghost" size="sm" onClick={() => onUpdate(action.id, { status: false, archived: false })}
             className="h-7 px-2 text-xs text-amber-600 hover:text-amber-700">
@@ -191,7 +184,7 @@ export function ActionRow({
       </TableCell>
 
       {/* Delete */}
-      <TableCell className="py-2 text-center">
+      <TableCell className="py-2 text-center w-[50px]">
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-red-600">

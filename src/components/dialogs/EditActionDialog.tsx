@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Action } from '@/lib/types'
-import { STAGES, QUARTERS } from '@/lib/constants'
+import { STAGES, DOMAINS } from '@/lib/constants'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -31,10 +31,11 @@ interface EditActionDialogProps {
 
 export function EditActionDialog({ action, onClose, onSave }: EditActionDialogProps) {
   const [formData, setFormData] = useState({
+    task_id: action.task_id,
     stage: action.stage,
+    domain: action.domain,
     action_list: action.action_list,
     owner: action.owner,
-    impact_quarter: action.impact_quarter,
     kpi: action.kpi,
   })
   const [loading, setLoading] = useState(false)
@@ -59,7 +60,7 @@ export function EditActionDialog({ action, onClose, onSave }: EditActionDialogPr
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label>Stage</Label>
+              <Label>Section</Label>
               <Select value={formData.stage} onValueChange={v => setFormData(p => ({ ...p, stage: v }))}>
                 <SelectTrigger>
                   <SelectValue />
@@ -70,19 +71,26 @@ export function EditActionDialog({ action, onClose, onSave }: EditActionDialogPr
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label>Impact Quarter</Label>
-              <Select value={formData.impact_quarter} onValueChange={v => setFormData(p => ({ ...p, impact_quarter: v }))}>
+              <Label>Domain</Label>
+              <Select value={formData.domain} onValueChange={v => setFormData(p => ({ ...p, domain: v }))}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select quarter" />
+                  <SelectValue placeholder="Select domain" />
                 </SelectTrigger>
                 <SelectContent>
-                  {QUARTERS.map(q => <SelectItem key={q} value={q}>{q}</SelectItem>)}
+                  {DOMAINS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label>Action</Label>
+            <Label>Task ID</Label>
+            <Input
+              value={formData.task_id}
+              onChange={e => setFormData(p => ({ ...p, task_id: e.target.value }))}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Action Plan</Label>
             <Textarea
               value={formData.action_list}
               onChange={e => setFormData(p => ({ ...p, action_list: e.target.value }))}
@@ -97,7 +105,7 @@ export function EditActionDialog({ action, onClose, onSave }: EditActionDialogPr
             />
           </div>
           <div className="space-y-1.5">
-            <Label>Measurable KPI</Label>
+            <Label>Metric</Label>
             <Textarea
               value={formData.kpi}
               onChange={e => setFormData(p => ({ ...p, kpi: e.target.value }))}

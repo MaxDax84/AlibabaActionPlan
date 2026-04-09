@@ -17,7 +17,7 @@ import { Toaster } from 'sonner'
 
 const defaultFilters: FilterState = {
   owner: 'all',
-  quarter: 'all',
+  domain: 'all',
   stage: 'all',
   status: 'all',
   search: '',

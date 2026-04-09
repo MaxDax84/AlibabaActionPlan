@@ -13,13 +13,14 @@ export async function exportToExcel(actions: Action[], filename: string = 'actio
 
   // Define columns
   worksheet.columns = [
-    { header: 'Stage', key: 'stage', width: 25 },
-    { header: 'Action List', key: 'action_list', width: 50 },
-    { header: 'Owner', key: 'owner', width: 20 },
-    { header: 'Impact Quarter', key: 'impact_quarter', width: 15 },
-    { header: 'KPI', key: 'kpi', width: 40 },
-    { header: 'Status', key: 'status', width: 12 },
-    { header: 'Created At', key: 'created_at', width: 20 },
+    { header: 'Task ID',     key: 'task_id',     width: 12 },
+    { header: 'Section',     key: 'stage',       width: 35 },
+    { header: 'Domain',      key: 'domain',      width: 18 },
+    { header: 'Action Plan', key: 'action_list', width: 55 },
+    { header: 'Owner',       key: 'owner',       width: 20 },
+    { header: 'Metric',      key: 'kpi',         width: 40 },
+    { header: 'Status',      key: 'status',      width: 14 },
+    { header: 'Created At',  key: 'created_at',  width: 20 },
   ]
 
   // Style header row
@@ -41,13 +42,14 @@ export async function exportToExcel(actions: Action[], filename: string = 'actio
   // Add data rows
   actions.forEach((action, index) => {
     const row = worksheet.addRow({
-      stage: action.stage,
+      task_id:     action.task_id,
+      stage:       action.stage,
+      domain:      action.domain,
       action_list: action.action_list,
-      owner: action.owner,
-      impact_quarter: action.impact_quarter,
-      kpi: action.kpi,
-      status: action.status ? 'DONE' : 'IN PROGRESS',
-      created_at: new Date(action.created_at).toLocaleDateString('en-US'),
+      owner:       action.owner,
+      kpi:         action.kpi,
+      status:      action.status ? 'DONE' : 'IN PROGRESS',
+      created_at:  new Date(action.created_at).toLocaleDateString('en-US'),
     })
 
     // Alternate row colors
@@ -76,7 +78,7 @@ export async function exportToExcel(actions: Action[], filename: string = 'actio
   // Auto-filter
   worksheet.autoFilter = {
     from: { row: 1, column: 1 },
-    to: { row: 1, column: 7 }
+    to: { row: 1, column: 8 }
   }
 
   // Generate buffer and download

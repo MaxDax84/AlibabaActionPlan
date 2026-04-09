@@ -17,7 +17,8 @@
       "Bash(npm run:*)",
       "Bash(npm list:*)",
       "Bash(rm:*)",
-      "Bash(npx shadcn@latest add popover --yes)"
+      "Bash(npx shadcn@latest add popover --yes)",
+      "WebFetch(domain:alidocs.dingtalk.com)"
     ]
   }
 }

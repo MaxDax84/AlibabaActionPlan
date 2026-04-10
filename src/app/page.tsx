@@ -210,18 +210,12 @@ export default function Home() {
                   )}
                 </TabsContent>
                 <TabsContent value="archive" className="m-0">
-                  {grouped ? (
-                    <GroupedActionTable
-                      actions={filteredActions}
-                      onUpdate={handleUpdate}
-                      onDelete={handleDelete}
-                      showArchived
-                    />
-                  ) : (
-                    <div className="p-1">
-                      <ActionTable actions={filteredActions} onUpdate={handleUpdate} onDelete={handleDelete} showArchived />
-                    </div>
-                  )}
+                  <GroupedActionTable
+                    actions={filteredActions}
+                    onUpdate={handleUpdate}
+                    onDelete={handleDelete}
+                    showArchived
+                  />
                 </TabsContent>
               </>
             )}

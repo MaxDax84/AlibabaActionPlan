@@ -32,10 +32,10 @@ INSERT INTO actions (task_id, stage, domain, action_list, owner, kpi, status, ar
  'Weekly results review (key learnings, why and next steps)',
  false, false),
 
--- ── Section 2: Lead Generation & Shopify Strategy ──────────────────────────
+-- ── Section 2: Lead Generation ──────────────────────────
 
 ('LG_01',
- 'Lead Generation & Shopify Strategy',
+ 'Lead Generation',
  'Lead Gen',
  'Leads tiers with ICP — define and implement lead scoring and tiering framework aligned with ICP criteria',
  'Jinjin',
@@ -43,7 +43,7 @@ INSERT INTO actions (task_id, stage, domain, action_list, owner, kpi, status, ar
  true, true),
 
 ('LG_02',
- 'Lead Generation & Shopify Strategy',
+ 'Lead Generation',
  'Lead Gen',
  'New landing page for leads collection',
  'Jinjin',
@@ -51,7 +51,7 @@ INSERT INTO actions (task_id, stage, domain, action_list, owner, kpi, status, ar
  true, true),
 
 ('LG_03',
- 'Lead Generation & Shopify Strategy',
+ 'Lead Generation',
  'Lead Gen',
  'AI enrichment tool for leads — automate lead data enrichment to improve qualification accuracy',
  'Jinjin',
@@ -59,7 +59,7 @@ INSERT INTO actions (task_id, stage, domain, action_list, owner, kpi, status, ar
  false, false),
 
 ('LG_04',
- 'Lead Generation & Shopify Strategy',
+ 'Lead Generation',
  'Lead Gen',
  'Collaboration with Marketing Team on Tradeshows to collect leads',
  'Jinjin',
@@ -67,17 +67,17 @@ INSERT INTO actions (task_id, stage, domain, action_list, owner, kpi, status, ar
  false, false),
 
 ('SH_01',
- 'Lead Generation & Shopify Strategy',
- 'Shopify',
+ 'Lead Generation',
+ 'Lead Gen',
  'Develop Lead Base for Upselling via Shopify implementation; focus Shopify user communication on Alibaba.com ICP; ensure proper translations of funnel and Payoneer for TA. (EU rollout planned post-US launch)',
  'Karl / Arianna',
  '# Free TS; # Orders',
  false, false),
 
--- ── Section 3: New Customer Acquisition & Policy ───────────────────────────
+-- ── Section 3: New Customer Acquisition ───────────────────────────
 
 ('AC_01',
- 'New Customer Acquisition & Policy',
+ 'New Customer Acquisition',
  'Acquisition',
  'Lead affiliate partnerships (main focus: Associations of core ICP categories, Unespain for Spain)',
  'Arianna',
@@ -85,7 +85,7 @@ INSERT INTO actions (task_id, stage, domain, action_list, owner, kpi, status, ar
  true, true),
 
 ('AC_02',
- 'New Customer Acquisition & Policy',
+ 'New Customer Acquisition',
  'Acquisition',
  'Handover of Channels from Franci to Ana',
  'Arianna',
@@ -93,7 +93,7 @@ INSERT INTO actions (task_id, stage, domain, action_list, owner, kpi, status, ar
  true, true),
 
 ('AC_03',
- 'New Customer Acquisition & Policy',
+ 'New Customer Acquisition',
  'Acquisition',
  'Working on reseller partnership in Italy and Spain / Recovery of partnerships renewed in PT',
  'Arianna',
@@ -101,7 +101,7 @@ INSERT INTO actions (task_id, stage, domain, action_list, owner, kpi, status, ar
  false, false),
 
 ('AC_04',
- 'New Customer Acquisition & Policy',
+ 'New Customer Acquisition',
  'Acquisition',
  'Amended contract — agreed on changes in Feb; solicited to Borui the amendment to contract in Mar',
  'Arianna',
@@ -109,7 +109,7 @@ INSERT INTO actions (task_id, stage, domain, action_list, owner, kpi, status, ar
  false, false),
 
 ('AC_05',
- 'New Customer Acquisition & Policy',
+ 'New Customer Acquisition',
  'Acquisition',
  'Payment follow-up — discussed solutions with Ella in Feb; follow-up on outstanding payments in Mar',
  'Arianna',
@@ -117,40 +117,40 @@ INSERT INTO actions (task_id, stage, domain, action_list, owner, kpi, status, ar
  false, false),
 
 ('PL_01',
- 'New Customer Acquisition & Policy',
- 'Policy',
+ 'New Customer Acquisition',
+ 'Acquisition',
  'Lead affiliate policy (DS / AM / Channels)',
  'Jinjin',
  'Budget approved',
  true, true),
 
 ('PL_02',
- 'New Customer Acquisition & Policy',
- 'Policy',
+ 'New Customer Acquisition',
+ 'Acquisition',
  'Commission policy re-definition',
  'Jinjin',
  'Policy officially shared with team',
  true, true),
 
 ('PL_03',
- 'New Customer Acquisition & Policy',
- 'Policy',
+ 'New Customer Acquisition',
+ 'Acquisition',
  'Compensation for consumption from FY26',
  'Jinjin',
  'Calculation shared with Leader',
  false, false),
 
 ('PL_04',
- 'New Customer Acquisition & Policy',
- 'Policy',
+ 'New Customer Acquisition',
+ 'Acquisition',
  'Commercial products — Packages, Guaranteed Ads, KSP',
  'Jinjin',
  'New Packages presented to teams; Agreement signed on Yida',
  false, false),
 
 ('PL_05',
- 'New Customer Acquisition & Policy',
- 'Policy',
+ 'New Customer Acquisition',
+ 'Acquisition',
  'Target assignment for FY26',
  'Jinjin',
  'Targets assigned and communicated',

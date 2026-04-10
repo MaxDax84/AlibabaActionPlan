@@ -26,12 +26,11 @@ import {
 interface AddActionDialogProps {
   open: boolean
   onClose: () => void
-  onAdd: (action: Omit<Action, 'id' | 'created_at' | 'updated_at' | 'archived'>) => Promise<void>
+  onAdd: (action: Omit<Action, 'id' | 'task_id' | 'created_at' | 'updated_at' | 'archived'>) => Promise<void>
 }
 
 export function AddActionDialog({ open, onClose, onAdd }: AddActionDialogProps) {
   const [formData, setFormData] = useState({
-    task_id: '',
     stage: '',
     domain: '',
     action_list: '',
@@ -57,7 +56,7 @@ export function AddActionDialog({ open, onClose, onAdd }: AddActionDialogProps) 
     setLoading(true)
     try {
       await onAdd(formData)
-      setFormData({ task_id: '', stage: '', domain: '', action_list: '', owner: '', kpi: '', status: false })
+      setFormData({ stage: '', domain: '', action_list: '', owner: '', kpi: '', status: false })
       setErrors({})
       onClose()
     } catch (err) {
@@ -99,16 +98,6 @@ export function AddActionDialog({ open, onClose, onAdd }: AddActionDialogProps) 
                 </SelectContent>
               </Select>
             </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="task_id">Task ID</Label>
-            <Input
-              id="task_id"
-              placeholder="e.g. BA_01"
-              value={formData.task_id}
-              onChange={e => setFormData(p => ({ ...p, task_id: e.target.value }))}
-            />
           </div>
 
           <div className="space-y-1.5">

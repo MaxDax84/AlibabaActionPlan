@@ -10,7 +10,7 @@ import { FilterBar } from '@/components/filters/FilterBar'
 import { VersionHistory } from '@/components/VersionHistory'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Plus, Download, Archive, ClipboardList, Loader2 } from 'lucide-react'
+import { Plus, Download, Archive, ClipboardList, Loader2, PackageCheck } from 'lucide-react'
 import { toast } from 'sonner'
 import { exportToExcel } from '@/lib/export'
 import { Toaster } from 'sonner'
@@ -83,6 +83,18 @@ export default function Home() {
     }
   }
 
+  const doneNotArchived = useMemo(() =>
+    actions.filter(a => !a.archived && a.status), [actions])
+
+  const handleArchiveDone = async () => {
+    try {
+      await Promise.all(doneNotArchived.map(a => updateAction(a.id, { archived: true })))
+      toast.success(`${doneNotArchived.length} action${doneNotArchived.length !== 1 ? 's' : ''} archived`)
+    } catch {
+      toast.error('Failed to archive')
+    }
+  }
+
   const stats = useMemo(() => ({
     total: actions.filter(a => !a.archived).length,
     pending: actions.filter(a => !a.archived && !a.status).length,
@@ -110,6 +122,20 @@ export default function Home() {
               <div className="relative">
                 <VersionHistory onRestore={fetchActions} />
               </div>
+              {tab === 'active' && doneNotArchived.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleArchiveDone}
+                  className="h-9 gap-1.5 border-green-300 text-green-700 hover:bg-green-50"
+                >
+                  <PackageCheck className="h-4 w-4" />
+                  <span className="hidden sm:inline">Archive Done</span>
+                  <span className="text-xs bg-green-100 text-green-700 rounded-full px-1.5 py-0.5 leading-none">
+                    {doneNotArchived.length}
+                  </span>
+                </Button>
+              )}
               <Button
                 variant="outline"
                 size="sm"

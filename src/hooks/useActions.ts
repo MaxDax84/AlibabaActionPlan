@@ -48,12 +48,13 @@ export function useActions() {
     fetchActions()
   }, [fetchActions])
 
-  const addAction = useCallback(async (action: Omit<Action, 'id' | 'created_at' | 'updated_at' | 'archived'>) => {
+  const addAction = useCallback(async (action: Omit<Action, 'id' | 'task_id' | 'created_at' | 'updated_at' | 'archived'>) => {
     // Optimistic: create a temp action immediately
     const tempId = `temp-${Date.now()}`
     const optimistic: Action = {
       ...action,
       id: tempId,
+      task_id: '…',
       archived: false,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),

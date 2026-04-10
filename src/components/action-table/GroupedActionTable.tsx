@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Action } from '@/lib/types'
 import { STAGE_COLORS, STAGE_DOT_COLORS, STAGE_HEADER_BG, STAGES } from '@/lib/constants'
-import { ActionRow, ActionCard, FADE_DURATION } from './ActionRow'
+import { ActionRow, ActionCard } from './ActionRow'
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -18,15 +18,10 @@ interface GroupedActionTableProps {
 const COLS = 7
 
 export function GroupedActionTable({ actions, onUpdate, onDelete, showArchived = false }: GroupedActionTableProps) {
-  const [fadingIds, setFadingIds] = useState<Set<string>>(new Set())
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
 
-  const handleDone = (id: string) => {
-    setFadingIds(prev => new Set(prev).add(id))
-    setTimeout(() => {
-      onUpdate(id, { status: true, archived: true })
-      setFadingIds(prev => { const s = new Set(prev); s.delete(id); return s })
-    }, FADE_DURATION)
+  const handleDone = (id: string, currentStatus: boolean) => {
+    onUpdate(id, { status: !currentStatus })
   }
 
   const toggleCollapse = (stage: string) =>
@@ -56,8 +51,8 @@ export function GroupedActionTable({ actions, onUpdate, onDelete, showArchived =
     onUpdate,
     onDelete,
     showArchived,
-    isFading: fadingIds.has(action.id),
-    onDone: () => handleDone(action.id),
+    isFading: false,
+    onDone: () => handleDone(action.id, action.status),
   })
 
   return (

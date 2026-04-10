@@ -150,7 +150,7 @@ export function ActionCard({
         opacity: isFading ? 0 : 1,
         transform: isFading ? 'translateX(12px)' : 'translateX(0)',
       }}
-      className="border-b border-slate-100 last:border-0 px-3 py-3 space-y-2"
+      className={cn('border-b border-slate-100 last:border-0 px-3 py-3 space-y-2', action.status && 'bg-green-50/40')}
     >
       {/* Top row: task ID + domain + actions */}
       <div className="flex items-start justify-between gap-2">
@@ -172,11 +172,13 @@ export function ActionCard({
               <ArchiveRestore className="h-3.5 w-3.5 mr-1" />Restore
             </Button>
           ) : (
-            <button onClick={onDone} disabled={isFading} title="Mark as done"
-              className={cn('group w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-150',
-                'border-slate-300 hover:border-green-500 hover:bg-green-50',
-                isFading && 'border-green-500 bg-green-500')}>
-              <Check className={cn('h-3.5 w-3.5 transition-all duration-150', isFading ? 'text-white' : 'text-transparent group-hover:text-green-500')} />
+            <button onClick={onDone} title={action.status ? 'Mark as in progress' : 'Mark as done'}
+              className={cn('group w-6 h-6 rounded-full border-2 flex items-center justify-center mx-auto transition-all duration-150',
+                action.status
+                  ? 'border-green-500 bg-green-500 hover:bg-green-600 hover:border-green-600'
+                  : 'border-slate-300 hover:border-green-500 hover:bg-green-50')}>
+              <Check className={cn('h-3.5 w-3.5 transition-all duration-150',
+                action.status ? 'text-white' : 'text-transparent group-hover:text-green-500')} />
             </button>
           )}
           <DeleteButton onDelete={() => onDelete(action.id)} />
@@ -231,14 +233,11 @@ export function ActionRow({
         opacity: isFading ? 0 : 1,
         transform: isFading ? 'translateX(12px)' : 'translateX(0)',
       }}
-      className="hover:bg-slate-50/60 align-top"
+      className={cn('align-top', action.status ? 'bg-green-50/40 hover:bg-green-50/60' : 'hover:bg-slate-50/60')}
     >
-      {/* Task ID */}
+      {/* Task ID — read-only, system generated */}
       <TableCell className="py-2 w-[90px]">
-        {showArchived
-          ? <span className="text-xs font-mono text-slate-500">{action.task_id}</span>
-          : <InlineText value={action.task_id} onSave={v => onUpdate(action.id, { task_id: v })} className="text-xs font-mono text-slate-500" />
-        }
+        <span className="text-xs font-mono text-slate-400">{action.task_id}</span>
       </TableCell>
 
       {/* Domain */}
@@ -281,11 +280,13 @@ export function ActionRow({
             <ArchiveRestore className="h-3.5 w-3.5 mr-1" />Restore
           </Button>
         ) : (
-          <button onClick={onDone} disabled={isFading} title="Mark as done"
+          <button onClick={onDone} title={action.status ? 'Mark as in progress' : 'Mark as done'}
             className={cn('group w-6 h-6 rounded-full border-2 flex items-center justify-center mx-auto transition-all duration-150',
-              'border-slate-300 hover:border-green-500 hover:bg-green-50',
-              isFading && 'border-green-500 bg-green-500')}>
-            <Check className={cn('h-3.5 w-3.5 transition-all duration-150', isFading ? 'text-white' : 'text-transparent group-hover:text-green-500')} />
+              action.status
+                ? 'border-green-500 bg-green-500 hover:bg-green-600 hover:border-green-600'
+                : 'border-slate-300 hover:border-green-500 hover:bg-green-50')}>
+            <Check className={cn('h-3.5 w-3.5 transition-all duration-150',
+              action.status ? 'text-white' : 'text-transparent group-hover:text-green-500')} />
           </button>
         )}
       </TableCell>

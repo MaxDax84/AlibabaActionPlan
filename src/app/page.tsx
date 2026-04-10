@@ -50,8 +50,10 @@ export default function Home() {
   const handleUpdate = async (id: string, updates: Partial<Action>) => {
     try {
       await updateAction(id, updates)
-      if (updates.status === true) {
-        toast.success('Marked as done — moved to Archive')
+      if (updates.status === true && updates.archived === undefined) {
+        toast.success('Marked as done')
+      } else if (updates.archived === true) {
+        toast.success('Moved to Archive')
       } else if (updates.archived === false) {
         toast.success('Restored to Active')
       } else {

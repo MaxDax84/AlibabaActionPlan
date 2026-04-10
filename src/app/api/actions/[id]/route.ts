@@ -16,11 +16,7 @@ export async function PATCH(
   const body = await request.json()
   const { id } = await params
 
-  // If marking as done, also archive it
   const updateData: Record<string, unknown> = { ...body, updated_at: new Date().toISOString() }
-  if (body.status === true && body.archived === undefined) {
-    updateData.archived = true
-  }
 
   const { data, error } = await supabase
     .from('actions')

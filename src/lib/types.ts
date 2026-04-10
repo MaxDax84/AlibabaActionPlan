@@ -22,9 +22,9 @@ export interface ActionVersion {
 }
 
 export type FilterState = {
-  owner: string
-  domain: string
-  stage: string
+  owner: string[]
+  domain: string[]
+  stage: string[]
   status: string
   search: string
 }

@@ -135,9 +135,9 @@ export function useActions() {
 export function useFilteredActions(actions: Action[], filters: FilterState, archived: boolean) {
   return actions.filter(action => {
     if (action.archived !== archived) return false
-    if (filters.owner && filters.owner !== 'all' && action.owner !== filters.owner) return false
-    if (filters.domain && filters.domain !== 'all' && action.domain !== filters.domain) return false
-    if (filters.stage && filters.stage !== 'all' && action.stage !== filters.stage) return false
+    if (filters.owner.length > 0 && !filters.owner.includes(action.owner)) return false
+    if (filters.domain.length > 0 && !filters.domain.includes(action.domain)) return false
+    if (filters.stage.length > 0 && !filters.stage.includes(action.stage)) return false
     if (filters.status === 'done' && !action.status) return false
     if (filters.status === 'pending' && action.status) return false
     if (filters.search) {

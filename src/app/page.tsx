@@ -16,9 +16,9 @@ import { exportToExcel } from '@/lib/export'
 import { Toaster } from 'sonner'
 
 const defaultFilters: FilterState = {
-  owner: 'all',
-  domain: 'all',
-  stage: 'all',
+  owner: [],
+  domain: [],
+  stage: [],
   status: 'all',
   search: '',
 }

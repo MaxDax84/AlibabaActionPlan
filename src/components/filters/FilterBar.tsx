@@ -2,17 +2,12 @@
 
 import { useState, useRef, useEffect } from 'react'
 import * as Portal from '@radix-ui/react-portal'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { FilterState, Action } from '@/lib/types'
+import { STAGES } from '@/lib/constants'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Search, X, ChevronDown, Check } from 'lucide-react'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 
 interface FilterBarProps {
@@ -21,24 +16,92 @@ interface FilterBarProps {
   actions: Action[]
 }
 
-// Owner filter: free-text input + dropdown with existing owners
+// ── Generic multi-select dropdown ─────────────────────────────
+
+function MultiSelect({
+  label,
+  options,
+  selected,
+  onChange,
+  className,
+}: {
+  label: string
+  options: string[]
+  selected: string[]
+  onChange: (v: string[]) => void
+  className?: string
+}) {
+  const toggle = (val: string) => {
+    onChange(selected.includes(val) ? selected.filter(v => v !== val) : [...selected, val])
+  }
+
+  const displayLabel = selected.length === 0
+    ? `All ${label}s`
+    : selected.length === 1
+      ? selected[0]
+      : `${selected.length} ${label}s`
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            'flex items-center justify-between gap-1.5 h-9 px-3 rounded-md border border-input bg-background text-sm',
+            'hover:bg-accent hover:text-accent-foreground transition-colors',
+            selected.length > 0 && 'border-blue-400 bg-blue-50 text-blue-700',
+            className
+          )}
+        >
+          <span className="truncate">{displayLabel}</span>
+          <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-50" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="p-1 w-56" align="start" avoidCollisions>
+        <button
+          type="button"
+          onClick={() => onChange([])}
+          className={cn(
+            'flex items-center justify-between w-full px-3 py-2 text-sm rounded hover:bg-slate-50',
+            selected.length === 0 && 'font-semibold text-slate-700'
+          )}
+        >
+          All {label}s
+          {selected.length === 0 && <Check className="h-3.5 w-3.5 text-blue-500" />}
+        </button>
+        <div className="border-t border-slate-100 mt-1 pt-1">
+          {options.map(opt => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => toggle(opt)}
+              className="flex items-center justify-between w-full px-3 py-2 text-sm rounded hover:bg-slate-50 text-left"
+            >
+              <span className="truncate">{opt}</span>
+              {selected.includes(opt) && <Check className="h-3.5 w-3.5 text-blue-500 shrink-0 ml-2" />}
+            </button>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+// ── Owner filter: free-text + dropdown ────────────────────────
+
 function OwnerFilter({
-  value,
+  selected,
   owners,
   onChange,
 }: {
-  value: string
+  selected: string[]
   owners: string[]
-  onChange: (v: string) => void
+  onChange: (v: string[]) => void
 }) {
   const [open, setOpen] = useState(false)
-  const [text, setText] = useState(value === 'all' ? '' : value)
+  const [text, setText] = useState('')
   const [coords, setCoords] = useState({ top: 0, left: 0, width: 0 })
   const wrapperRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (value === 'all') setText('')
-  }, [value])
 
   useEffect(() => {
     if (!open) return
@@ -55,48 +118,45 @@ function OwnerFilter({
 
   const filtered = owners.filter(o => o.toLowerCase().includes(text.toLowerCase()))
 
-  const apply = (v: string) => {
-    setText(v === 'all' ? '' : v)
-    onChange(v || 'all')
-    setOpen(false)
+  const toggle = (val: string) => {
+    onChange(selected.includes(val) ? selected.filter(v => v !== val) : [...selected, val])
   }
 
   const handleFocus = () => {
     if (wrapperRef.current) {
       const rect = wrapperRef.current.getBoundingClientRect()
-      const DROPDOWN_H = 200
+      const DROPDOWN_H = 220
       const spaceBelow = window.innerHeight - rect.bottom
       const top = spaceBelow >= DROPDOWN_H
         ? rect.bottom + window.scrollY + 4
         : rect.top + window.scrollY - DROPDOWN_H - 4
-      setCoords({ top, left: rect.left + window.scrollX, width: rect.width })
+      setCoords({ top, left: rect.left + window.scrollX, width: Math.max(rect.width, 180) })
     }
     setOpen(true)
   }
 
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setText(e.target.value)
-    onChange(e.target.value || 'all')
-    setOpen(true)
-  }
+  const displayLabel = selected.length === 0
+    ? ''
+    : selected.length === 1 ? selected[0] : `${selected.length} owners`
 
   return (
-    <div ref={wrapperRef} className="relative w-[150px]">
-      <div className="relative">
+    <div ref={wrapperRef} className="relative flex-1 min-w-[120px]">
+      <div className={cn(
+        'relative flex items-center rounded-md border border-input bg-background',
+        selected.length > 0 && 'border-blue-400 bg-blue-50'
+      )}>
         <Input
           placeholder="Owner..."
-          value={text}
-          onChange={handleInput}
+          value={text || displayLabel}
+          onChange={e => { setText(e.target.value); setOpen(true) }}
           onFocus={handleFocus}
           onKeyDown={e => { if (e.key === 'Escape' || e.key === 'Enter') setOpen(false) }}
-          className="h-9 pr-7 text-sm"
+          className={cn('h-9 pr-7 border-0 bg-transparent focus-visible:ring-0 text-sm',
+            selected.length > 0 && 'text-blue-700')}
         />
         <button
           type="button"
-          onClick={() => {
-            handleFocus()
-            setOpen(o => !o)
-          }}
+          onClick={() => { handleFocus(); setOpen(o => !o) }}
           className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
         >
           <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', open && 'rotate-180')} />
@@ -108,26 +168,23 @@ function OwnerFilter({
           <div
             id="owner-filter-portal"
             style={{ position: 'absolute', top: coords.top, left: coords.left, width: coords.width, zIndex: 9999 }}
-            className="bg-white border border-slate-200 rounded-md shadow-lg py-1 max-h-48 overflow-y-auto"
+            className="bg-white border border-slate-200 rounded-md shadow-lg py-1 max-h-52 overflow-y-auto"
           >
-            <button type="button" onClick={() => apply('all')}
-              className={cn('flex items-center gap-2 w-full px-3 py-1.5 text-sm hover:bg-slate-50 text-slate-500', value === 'all' && 'font-semibold text-slate-700')}>
+            <button type="button" onClick={() => { onChange([]); setText(''); setOpen(false) }}
+              className={cn('flex items-center justify-between w-full px-3 py-1.5 text-sm hover:bg-slate-50 text-slate-500',
+                selected.length === 0 && 'font-semibold text-slate-700')}>
               All Owners
+              {selected.length === 0 && <Check className="h-3.5 w-3.5 text-blue-500" />}
             </button>
-            {filtered.map(o => (
-              <button key={o} type="button" onClick={() => apply(o)}
-                className={cn('flex items-center justify-between w-full px-3 py-1.5 text-sm hover:bg-slate-50', value === o && 'bg-slate-50 font-semibold')}>
-                {o}
-                {value === o && <Check className="h-3.5 w-3.5 text-blue-500" />}
-              </button>
-            ))}
-            {text && !owners.includes(text) && (
-              <button type="button" onClick={() => apply(text)}
-                className="flex items-center gap-2 w-full px-3 py-1.5 text-sm hover:bg-slate-50 text-blue-600 border-t border-slate-100">
-                <Search className="h-3 w-3" />
-                Search "{text}"
-              </button>
-            )}
+            <div className="border-t border-slate-100 mt-1 pt-1">
+              {filtered.map(o => (
+                <button key={o} type="button" onClick={() => toggle(o)}
+                  className="flex items-center justify-between w-full px-3 py-1.5 text-sm hover:bg-slate-50">
+                  {o}
+                  {selected.includes(o) && <Check className="h-3.5 w-3.5 text-blue-500" />}
+                </button>
+              ))}
+            </div>
           </div>
         </Portal.Root>
       )}
@@ -135,23 +192,27 @@ function OwnerFilter({
   )
 }
 
+// ── FilterBar ─────────────────────────────────────────────────
+
 export function FilterBar({ filters, onFiltersChange, actions }: FilterBarProps) {
   const owners = Array.from(new Set(actions.map(a => a.owner))).filter(Boolean).sort()
   const domains = Array.from(new Set(actions.map(a => a.domain))).filter(Boolean).sort()
-  const stages = Array.from(new Set(actions.map(a => a.stage))).filter(Boolean).sort()
+  // Sections in defined order, only those present in current tab
+  const stages = STAGES.filter(s => actions.some(a => a.stage === s))
 
-  const update = (key: keyof FilterState, value: string) =>
+  const update = <K extends keyof FilterState>(key: K, value: FilterState[K]) =>
     onFiltersChange({ ...filters, [key]: value })
 
-  const hasActiveFilters = filters.owner !== 'all' || filters.domain !== 'all' ||
-    filters.stage !== 'all' || filters.status !== 'all' || filters.search !== ''
+  const hasActiveFilters =
+    filters.owner.length > 0 || filters.domain.length > 0 ||
+    filters.stage.length > 0 || filters.search !== ''
 
   const clearAll = () =>
-    onFiltersChange({ owner: 'all', domain: 'all', stage: 'all', status: 'all', search: '' })
+    onFiltersChange({ owner: [], domain: [], stage: [], status: 'all', search: '' })
 
   return (
     <div className="flex flex-col gap-2">
-      {/* Row 1: search (full width) */}
+      {/* Row 1: search */}
       <div className="relative w-full">
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
         <Input
@@ -164,42 +225,27 @@ export function FilterBar({ filters, onFiltersChange, actions }: FilterBarProps)
 
       {/* Row 2: filters */}
       <div className="flex flex-wrap items-center gap-2">
-        <Select value={filters.stage} onValueChange={v => update('stage', v)}>
-          <SelectTrigger className="flex-1 min-w-[140px] h-9">
-            <SelectValue placeholder="Section" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Sections</SelectItem>
-            {stages.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-          </SelectContent>
-        </Select>
+        <MultiSelect
+          label="Section"
+          options={stages}
+          selected={filters.stage}
+          onChange={v => update('stage', v)}
+          className="flex-1 min-w-[140px]"
+        />
 
-        <Select value={filters.domain} onValueChange={v => update('domain', v)}>
-          <SelectTrigger className="flex-1 min-w-[120px] h-9">
-            <SelectValue placeholder="Domain" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Domains</SelectItem>
-            {domains.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
-          </SelectContent>
-        </Select>
+        <MultiSelect
+          label="Domain"
+          options={domains}
+          selected={filters.domain}
+          onChange={v => update('domain', v)}
+          className="flex-1 min-w-[120px]"
+        />
 
         <OwnerFilter
-          value={filters.owner}
+          selected={filters.owner}
           owners={owners}
           onChange={v => update('owner', v)}
         />
-
-        <Select value={filters.status} onValueChange={v => update('status', v)}>
-          <SelectTrigger className="flex-1 min-w-[110px] h-9">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="pending">In Progress</SelectItem>
-            <SelectItem value="done">Done</SelectItem>
-          </SelectContent>
-        </Select>
 
         {hasActiveFilters && (
           <Button variant="ghost" size="sm" onClick={clearAll} className="h-9 px-3 text-slate-500 shrink-0">

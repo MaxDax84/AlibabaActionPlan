@@ -167,7 +167,7 @@ export function ActionCard({
         <div className="flex items-center gap-1 shrink-0">
           {showArchived ? (
             <Button variant="ghost" size="sm"
-              onClick={() => onUpdate(action.id, { status: false, archived: false })}
+              onClick={() => onUpdate(action.id, { archived: false })}
               className="h-7 px-2 text-xs text-amber-600 hover:text-amber-700">
               <ArchiveRestore className="h-3.5 w-3.5 mr-1" />Restore
             </Button>
@@ -275,7 +275,7 @@ export function ActionRow({
       {/* Done / Restore */}
       <TableCell className="py-2 text-center w-[70px]">
         {showArchived ? (
-          <Button variant="ghost" size="sm" onClick={() => onUpdate(action.id, { status: false, archived: false })}
+          <Button variant="ghost" size="sm" onClick={() => onUpdate(action.id, { archived: false })}
             className="h-7 px-2 text-xs text-amber-600 hover:text-amber-700">
             <ArchiveRestore className="h-3.5 w-3.5 mr-1" />Restore
           </Button>

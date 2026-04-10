@@ -32,7 +32,7 @@ export function GroupedActionTable({ actions, onUpdate, onDelete, showArchived =
 
   const handleRestoreAll = (e: React.MouseEvent, items: Action[]) => {
     e.stopPropagation()
-    items.forEach(a => onUpdate(a.id, { status: false, archived: false }))
+    items.forEach(a => onUpdate(a.id, { archived: false }))
   }
 
   const toggleCollapse = (stage: string) =>

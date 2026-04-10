@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Action } from '@/lib/types'
 import { STAGE_COLORS, STAGE_DOT_COLORS, STAGE_HEADER_BG, STAGES } from '@/lib/constants'
-import { ActionRow, FADE_DURATION } from './ActionRow'
+import { ActionRow, ActionCard, FADE_DURATION } from './ActionRow'
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -15,7 +15,7 @@ interface GroupedActionTableProps {
   showArchived?: boolean
 }
 
-const COLS = 7 // Task ID + Domain + Action Plan + Owner + Metric + Done + Delete
+const COLS = 7
 
 export function GroupedActionTable({ actions, onUpdate, onDelete, showArchived = false }: GroupedActionTableProps) {
   const [fadingIds, setFadingIds] = useState<Set<string>>(new Set())
@@ -32,7 +32,6 @@ export function GroupedActionTable({ actions, onUpdate, onDelete, showArchived =
   const toggleCollapse = (stage: string) =>
     setCollapsed(prev => { const s = new Set(prev); s.has(stage) ? s.delete(stage) : s.add(stage); return s })
 
-  // Build ordered groups
   const knownStages = new Set(STAGES)
   const groups = [
     ...STAGES.map(stage => ({ stage, items: actions.filter(a => a.stage === stage) })).filter(g => g.items.length > 0),
@@ -52,74 +51,117 @@ export function GroupedActionTable({ actions, onUpdate, onDelete, showArchived =
     )
   }
 
-  return (
-    // Single table — one header, all groups share column widths
-    <div className="rounded-md border border-slate-200 overflow-visible">
-      <Table>
-        <TableHeader className="sticky top-16 z-10 bg-slate-50 shadow-sm">
-          <TableRow className="bg-slate-50 hover:bg-slate-50">
-            <TableHead className="w-[90px] font-semibold text-slate-700">Task ID</TableHead>
-            <TableHead className="w-[130px] font-semibold text-slate-700">Domain</TableHead>
-            <TableHead className="font-semibold text-slate-700">Action Plan</TableHead>
-            <TableHead className="w-[120px] font-semibold text-slate-700">Owner</TableHead>
-            <TableHead className="w-[220px] font-semibold text-slate-700">Metric</TableHead>
-            <TableHead className="w-[70px] text-center font-semibold text-slate-700">Done</TableHead>
-            <TableHead className="w-[50px]"></TableHead>
-          </TableRow>
-        </TableHeader>
+  const rowProps = (action: Action) => ({
+    action,
+    onUpdate,
+    onDelete,
+    showArchived,
+    isFading: fadingIds.has(action.id),
+    onDone: () => handleDone(action.id),
+  })
 
+  return (
+    <div className="rounded-md border border-slate-200 overflow-visible">
+
+      {/* ── Mobile: card layout (hidden on md+) ───────────────── */}
+      <div className="md:hidden divide-y divide-slate-100">
         {groups.map(({ stage, items }) => {
           const isCollapsed = collapsed.has(stage)
           const doneCount = items.filter(a => a.status).length
-
           return (
-            <TableBody key={stage}>
-              {/* Stage group header row */}
-              <TableRow
-                className={cn(
-                  'cursor-pointer select-none border-t',
-                  STAGE_HEADER_BG[stage] || 'bg-slate-100 border-slate-200',
-                  'hover:brightness-95'
-                )}
+            <div key={stage}>
+              {/* Section header */}
+              <button
+                type="button"
                 onClick={() => toggleCollapse(stage)}
+                className={cn(
+                  'w-full flex items-center gap-2.5 px-3 py-2.5 text-left border-b',
+                  STAGE_HEADER_BG[stage] || 'bg-slate-100 border-slate-200'
+                )}
               >
-                <TableCell colSpan={COLS} className="py-2 px-4">
-                  <div className="flex items-center gap-2.5">
-                    {isCollapsed
-                      ? <ChevronRight className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                      : <ChevronDown className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                    }
-                    <span className={cn(
-                      'inline-flex items-center gap-1.5 text-xs font-semibold px-2 py-0.5 rounded-full border',
-                      STAGE_COLORS[stage] || 'bg-slate-100 text-slate-700 border-slate-200'
-                    )}>
-                      <span className={cn('w-1.5 h-1.5 rounded-full', STAGE_DOT_COLORS[stage] || 'bg-slate-400')} />
-                      {stage}
-                    </span>
-                    <span className="text-xs text-slate-400">
-                      {items.length} action{items.length !== 1 ? 's' : ''}
-                      {doneCount > 0 && ` · ${doneCount} done`}
-                    </span>
-                  </div>
-                </TableCell>
-              </TableRow>
+                {isCollapsed
+                  ? <ChevronRight className="h-3.5 w-3.5 text-slate-500 shrink-0" />
+                  : <ChevronDown className="h-3.5 w-3.5 text-slate-500 shrink-0" />
+                }
+                <span className={cn(
+                  'inline-flex items-center gap-1.5 text-xs font-semibold px-2 py-0.5 rounded-full border',
+                  STAGE_COLORS[stage] || 'bg-slate-100 text-slate-700 border-slate-200'
+                )}>
+                  <span className={cn('w-1.5 h-1.5 rounded-full', STAGE_DOT_COLORS[stage] || 'bg-slate-400')} />
+                  {stage}
+                </span>
+                <span className="text-xs text-slate-500 ml-auto">
+                  {items.length} action{items.length !== 1 ? 's' : ''}
+                  {doneCount > 0 && ` · ${doneCount} done`}
+                </span>
+              </button>
 
-              {/* Action rows for this stage */}
+              {/* Cards */}
               {!isCollapsed && items.map(action => (
-                <ActionRow
-                  key={action.id}
-                  action={action}
-                  onUpdate={onUpdate}
-                  onDelete={onDelete}
-                  showArchived={showArchived}
-                  isFading={fadingIds.has(action.id)}
-                  onDone={() => handleDone(action.id)}
-                />
+                <ActionCard key={action.id} {...rowProps(action)} />
               ))}
-            </TableBody>
+            </div>
           )
         })}
-      </Table>
+      </div>
+
+      {/* ── Desktop: table layout (hidden below md) ───────────── */}
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader className="sticky top-16 z-10 bg-slate-50 shadow-sm">
+            <TableRow className="bg-slate-50 hover:bg-slate-50">
+              <TableHead className="w-[90px] font-semibold text-slate-700">Task ID</TableHead>
+              <TableHead className="w-[130px] font-semibold text-slate-700">Domain</TableHead>
+              <TableHead className="font-semibold text-slate-700">Action Plan</TableHead>
+              <TableHead className="w-[120px] font-semibold text-slate-700">Owner</TableHead>
+              <TableHead className="w-[220px] font-semibold text-slate-700">Metric</TableHead>
+              <TableHead className="w-[70px] text-center font-semibold text-slate-700">Done</TableHead>
+              <TableHead className="w-[50px]"></TableHead>
+            </TableRow>
+          </TableHeader>
+
+          {groups.map(({ stage, items }) => {
+            const isCollapsed = collapsed.has(stage)
+            const doneCount = items.filter(a => a.status).length
+            return (
+              <TableBody key={stage}>
+                <TableRow
+                  className={cn(
+                    'cursor-pointer select-none border-t',
+                    STAGE_HEADER_BG[stage] || 'bg-slate-100 border-slate-200',
+                    'hover:brightness-95'
+                  )}
+                  onClick={() => toggleCollapse(stage)}
+                >
+                  <TableCell colSpan={COLS} className="py-2 px-4">
+                    <div className="flex items-center gap-2.5">
+                      {isCollapsed
+                        ? <ChevronRight className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                        : <ChevronDown className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                      }
+                      <span className={cn(
+                        'inline-flex items-center gap-1.5 text-xs font-semibold px-2 py-0.5 rounded-full border',
+                        STAGE_COLORS[stage] || 'bg-slate-100 text-slate-700 border-slate-200'
+                      )}>
+                        <span className={cn('w-1.5 h-1.5 rounded-full', STAGE_DOT_COLORS[stage] || 'bg-slate-400')} />
+                        {stage}
+                      </span>
+                      <span className="text-xs text-slate-400">
+                        {items.length} action{items.length !== 1 ? 's' : ''}
+                        {doneCount > 0 && ` · ${doneCount} done`}
+                      </span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+
+                {!isCollapsed && items.map(action => (
+                  <ActionRow key={action.id} {...rowProps(action)} />
+                ))}
+              </TableBody>
+            )
+          })}
+        </Table>
+      </div>
     </div>
   )
 }

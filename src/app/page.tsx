@@ -148,24 +148,24 @@ export default function Home() {
       <main className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="bg-white rounded-lg border border-slate-200 p-4">
-            <p className="text-xs text-slate-500 mb-1">Active Actions</p>
-            <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
+          <div className="bg-white rounded-lg border border-slate-200 p-3 sm:p-4">
+            <p className="text-xs text-slate-500 mb-1 truncate">Active</p>
+            <p className="text-xl sm:text-2xl font-bold text-slate-900">{stats.total}</p>
           </div>
-          <div className="bg-white rounded-lg border border-slate-200 p-4">
-            <p className="text-xs text-slate-500 mb-1">In Progress</p>
-            <p className="text-2xl font-bold text-amber-600">{stats.pending}</p>
+          <div className="bg-white rounded-lg border border-slate-200 p-3 sm:p-4">
+            <p className="text-xs text-slate-500 mb-1 truncate">In Progress</p>
+            <p className="text-xl sm:text-2xl font-bold text-amber-600">{stats.pending}</p>
           </div>
-          <div className="bg-white rounded-lg border border-slate-200 p-4">
-            <p className="text-xs text-slate-500 mb-1">Completed</p>
-            <p className="text-2xl font-bold text-green-600">{stats.done}</p>
+          <div className="bg-white rounded-lg border border-slate-200 p-3 sm:p-4">
+            <p className="text-xs text-slate-500 mb-1 truncate">Completed</p>
+            <p className="text-xl sm:text-2xl font-bold text-green-600">{stats.done}</p>
           </div>
         </div>
 
         {/* Tabs */}
         <Tabs value={tab} onValueChange={v => { setTab(v as 'active' | 'archive'); setFilters(defaultFilters) }}>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+          <div className="flex flex-col gap-3 mb-4">
             <TabsList className="self-start">
               <TabsTrigger value="active" className="gap-1.5">
                 <ClipboardList className="h-3.5 w-3.5" />
@@ -186,9 +186,7 @@ export default function Home() {
                 )}
               </TabsTrigger>
             </TabsList>
-            <div className="flex-1">
-              <FilterBar filters={filters} onFiltersChange={setFilters} actions={tabActions} />
-            </div>
+            <FilterBar filters={filters} onFiltersChange={setFilters} actions={tabActions} />
           </div>
 
           <div className="bg-white rounded-lg border border-slate-200">

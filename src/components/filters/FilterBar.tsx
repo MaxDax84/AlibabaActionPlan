@@ -150,60 +150,64 @@ export function FilterBar({ filters, onFiltersChange, actions }: FilterBarProps)
     onFiltersChange({ owner: 'all', domain: 'all', stage: 'all', status: 'all', search: '' })
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <div className="relative flex-1 min-w-[180px]">
+    <div className="flex flex-col gap-2">
+      {/* Row 1: search (full width) */}
+      <div className="relative w-full">
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
         <Input
           placeholder="Search actions..."
           value={filters.search}
           onChange={e => update('search', e.target.value)}
-          className="pl-8 h-9"
+          className="pl-8 h-9 w-full"
         />
       </div>
 
-      <Select value={filters.stage} onValueChange={v => update('stage', v)}>
-        <SelectTrigger className="w-[180px] h-9">
-          <SelectValue placeholder="Section" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Sections</SelectItem>
-          {stages.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-        </SelectContent>
-      </Select>
+      {/* Row 2: filters */}
+      <div className="flex flex-wrap items-center gap-2">
+        <Select value={filters.stage} onValueChange={v => update('stage', v)}>
+          <SelectTrigger className="flex-1 min-w-[140px] h-9">
+            <SelectValue placeholder="Section" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Sections</SelectItem>
+            {stages.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+          </SelectContent>
+        </Select>
 
-      <Select value={filters.domain} onValueChange={v => update('domain', v)}>
-        <SelectTrigger className="w-[140px] h-9">
-          <SelectValue placeholder="Domain" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Domains</SelectItem>
-          {domains.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
-        </SelectContent>
-      </Select>
+        <Select value={filters.domain} onValueChange={v => update('domain', v)}>
+          <SelectTrigger className="flex-1 min-w-[120px] h-9">
+            <SelectValue placeholder="Domain" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Domains</SelectItem>
+            {domains.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+          </SelectContent>
+        </Select>
 
-      <OwnerFilter
-        value={filters.owner}
-        owners={owners}
-        onChange={v => update('owner', v)}
-      />
+        <OwnerFilter
+          value={filters.owner}
+          owners={owners}
+          onChange={v => update('owner', v)}
+        />
 
-      <Select value={filters.status} onValueChange={v => update('status', v)}>
-        <SelectTrigger className="w-[125px] h-9">
-          <SelectValue placeholder="Status" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Status</SelectItem>
-          <SelectItem value="pending">In Progress</SelectItem>
-          <SelectItem value="done">Done</SelectItem>
-        </SelectContent>
-      </Select>
+        <Select value={filters.status} onValueChange={v => update('status', v)}>
+          <SelectTrigger className="flex-1 min-w-[110px] h-9">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="pending">In Progress</SelectItem>
+            <SelectItem value="done">Done</SelectItem>
+          </SelectContent>
+        </Select>
 
-      {hasActiveFilters && (
-        <Button variant="ghost" size="sm" onClick={clearAll} className="h-9 px-3 text-slate-500">
-          <X className="h-3.5 w-3.5 mr-1" />
-          Clear
-        </Button>
-      )}
+        {hasActiveFilters && (
+          <Button variant="ghost" size="sm" onClick={clearAll} className="h-9 px-3 text-slate-500 shrink-0">
+            <X className="h-3.5 w-3.5 mr-1" />
+            Clear
+          </Button>
+        )}
+      </div>
     </div>
   )
 }

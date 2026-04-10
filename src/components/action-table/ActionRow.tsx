@@ -165,21 +165,20 @@ export function ActionCard({
           </span>
         </div>
         <div className="flex items-center gap-1 shrink-0">
-          {showArchived ? (
+          <button onClick={onDone} title={action.status ? 'Mark as in progress' : 'Mark as done'}
+            className={cn('group w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-150',
+              action.status
+                ? 'border-green-500 bg-green-500 hover:bg-green-600 hover:border-green-600'
+                : 'border-slate-300 hover:border-green-500 hover:bg-green-50')}>
+            <Check className={cn('h-3.5 w-3.5 transition-all duration-150',
+              action.status ? 'text-white' : 'text-transparent group-hover:text-green-500')} />
+          </button>
+          {showArchived && (
             <Button variant="ghost" size="sm"
               onClick={() => onUpdate(action.id, { archived: false })}
-              className="h-7 px-2 text-xs text-amber-600 hover:text-amber-700">
-              <ArchiveRestore className="h-3.5 w-3.5 mr-1" />Restore
+              className="h-7 px-1.5 text-amber-600 hover:text-amber-700">
+              <ArchiveRestore className="h-3.5 w-3.5" />
             </Button>
-          ) : (
-            <button onClick={onDone} title={action.status ? 'Mark as in progress' : 'Mark as done'}
-              className={cn('group w-6 h-6 rounded-full border-2 flex items-center justify-center mx-auto transition-all duration-150',
-                action.status
-                  ? 'border-green-500 bg-green-500 hover:bg-green-600 hover:border-green-600'
-                  : 'border-slate-300 hover:border-green-500 hover:bg-green-50')}>
-              <Check className={cn('h-3.5 w-3.5 transition-all duration-150',
-                action.status ? 'text-white' : 'text-transparent group-hover:text-green-500')} />
-            </button>
           )}
           <DeleteButton onDelete={() => onDelete(action.id)} />
         </div>
@@ -272,28 +271,29 @@ export function ActionRow({
         }
       </TableCell>
 
-      {/* Done / Restore */}
+      {/* Done — always visible */}
       <TableCell className="py-2 text-center w-[70px]">
-        {showArchived ? (
-          <Button variant="ghost" size="sm" onClick={() => onUpdate(action.id, { archived: false })}
-            className="h-7 px-2 text-xs text-amber-600 hover:text-amber-700">
-            <ArchiveRestore className="h-3.5 w-3.5 mr-1" />Restore
-          </Button>
-        ) : (
-          <button onClick={onDone} title={action.status ? 'Mark as in progress' : 'Mark as done'}
-            className={cn('group w-6 h-6 rounded-full border-2 flex items-center justify-center mx-auto transition-all duration-150',
-              action.status
-                ? 'border-green-500 bg-green-500 hover:bg-green-600 hover:border-green-600'
-                : 'border-slate-300 hover:border-green-500 hover:bg-green-50')}>
-            <Check className={cn('h-3.5 w-3.5 transition-all duration-150',
-              action.status ? 'text-white' : 'text-transparent group-hover:text-green-500')} />
-          </button>
-        )}
+        <button onClick={onDone} title={action.status ? 'Mark as in progress' : 'Mark as done'}
+          className={cn('group w-6 h-6 rounded-full border-2 flex items-center justify-center mx-auto transition-all duration-150',
+            action.status
+              ? 'border-green-500 bg-green-500 hover:bg-green-600 hover:border-green-600'
+              : 'border-slate-300 hover:border-green-500 hover:bg-green-50')}>
+          <Check className={cn('h-3.5 w-3.5 transition-all duration-150',
+            action.status ? 'text-white' : 'text-transparent group-hover:text-green-500')} />
+        </button>
       </TableCell>
 
-      {/* Delete */}
-      <TableCell className="py-2 text-center w-[50px]">
-        <DeleteButton onDelete={() => onDelete(action.id)} />
+      {/* Restore (Archive only) + Delete */}
+      <TableCell className="py-2 text-center w-[70px]">
+        <div className="flex items-center justify-center gap-0.5">
+          {showArchived && (
+            <Button variant="ghost" size="sm" onClick={() => onUpdate(action.id, { archived: false })}
+              className="h-7 px-1.5 text-xs text-amber-600 hover:text-amber-700">
+              <ArchiveRestore className="h-3.5 w-3.5" />
+            </Button>
+          )}
+          <DeleteButton onDelete={() => onDelete(action.id)} />
+        </div>
       </TableCell>
     </TableRow>
   )

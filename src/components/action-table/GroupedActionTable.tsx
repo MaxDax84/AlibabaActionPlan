@@ -5,7 +5,7 @@ import { Action } from '@/lib/types'
 import { STAGE_COLORS, STAGE_DOT_COLORS, STAGE_HEADER_BG, STAGES } from '@/lib/constants'
 import { ActionRow, ActionCard } from './ActionRow'
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table'
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { ChevronDown, ChevronRight, CheckCheck } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface GroupedActionTableProps {
@@ -22,6 +22,12 @@ export function GroupedActionTable({ actions, onUpdate, onDelete, showArchived =
 
   const handleDone = (id: string, currentStatus: boolean) => {
     onUpdate(id, { status: !currentStatus })
+  }
+
+  const handleMarkAllDone = (e: React.MouseEvent, items: Action[]) => {
+    e.stopPropagation()
+    const allDone = items.every(a => a.status)
+    items.forEach(a => onUpdate(a.id, { status: !allDone }))
   }
 
   const toggleCollapse = (stage: string) =>
@@ -89,6 +95,22 @@ export function GroupedActionTable({ actions, onUpdate, onDelete, showArchived =
                   {items.length} action{items.length !== 1 ? 's' : ''}
                   {doneCount > 0 && ` · ${doneCount} done`}
                 </span>
+                {!showArchived && (
+                  <button
+                    type="button"
+                    onClick={e => handleMarkAllDone(e, items)}
+                    title={items.every(a => a.status) ? 'Unmark all' : 'Mark all as done'}
+                    className={cn(
+                      'flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border transition-colors shrink-0',
+                      items.every(a => a.status)
+                        ? 'bg-green-100 text-green-700 border-green-300 hover:bg-green-200'
+                        : 'bg-white/60 text-slate-500 border-slate-300 hover:bg-white hover:text-green-700'
+                    )}
+                  >
+                    <CheckCheck className="h-3 w-3" />
+                    <span className="hidden sm:inline">{items.every(a => a.status) ? 'Unmark all' : 'All done'}</span>
+                  </button>
+                )}
               </button>
 
               {/* Cards */}
@@ -145,6 +167,22 @@ export function GroupedActionTable({ actions, onUpdate, onDelete, showArchived =
                         {items.length} action{items.length !== 1 ? 's' : ''}
                         {doneCount > 0 && ` · ${doneCount} done`}
                       </span>
+                      {!showArchived && (
+                        <button
+                          type="button"
+                          onClick={e => handleMarkAllDone(e, items)}
+                          title={items.every(a => a.status) ? 'Unmark all' : 'Mark all as done'}
+                          className={cn(
+                            'ml-auto flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border transition-colors',
+                            items.every(a => a.status)
+                              ? 'bg-green-100 text-green-700 border-green-300 hover:bg-green-200'
+                              : 'bg-white/60 text-slate-500 border-slate-300 hover:bg-white hover:text-green-700'
+                          )}
+                        >
+                          <CheckCheck className="h-3 w-3" />
+                          {items.every(a => a.status) ? 'Unmark all' : 'All done'}
+                        </button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

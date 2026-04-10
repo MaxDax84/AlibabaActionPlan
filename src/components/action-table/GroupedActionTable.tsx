@@ -5,7 +5,7 @@ import { Action } from '@/lib/types'
 import { STAGE_COLORS, STAGE_DOT_COLORS, STAGE_HEADER_BG, STAGES } from '@/lib/constants'
 import { ActionRow, ActionCard } from './ActionRow'
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table'
-import { ChevronDown, ChevronRight, CheckCheck } from 'lucide-react'
+import { ChevronDown, ChevronRight, CheckCheck, ArchiveRestore } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface GroupedActionTableProps {
@@ -28,6 +28,11 @@ export function GroupedActionTable({ actions, onUpdate, onDelete, showArchived =
     e.stopPropagation()
     const allDone = items.every(a => a.status)
     items.forEach(a => onUpdate(a.id, { status: !allDone }))
+  }
+
+  const handleRestoreAll = (e: React.MouseEvent, items: Action[]) => {
+    e.stopPropagation()
+    items.forEach(a => onUpdate(a.id, { status: false, archived: false }))
   }
 
   const toggleCollapse = (stage: string) =>
@@ -95,7 +100,7 @@ export function GroupedActionTable({ actions, onUpdate, onDelete, showArchived =
                   {items.length} action{items.length !== 1 ? 's' : ''}
                   {doneCount > 0 && ` · ${doneCount} done`}
                 </span>
-                {!showArchived && (
+                {!showArchived ? (
                   <button
                     type="button"
                     onClick={e => handleMarkAllDone(e, items)}
@@ -109,6 +114,16 @@ export function GroupedActionTable({ actions, onUpdate, onDelete, showArchived =
                   >
                     <CheckCheck className="h-3 w-3" />
                     <span className="hidden sm:inline">{items.every(a => a.status) ? 'Unmark all' : 'All done'}</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={e => handleRestoreAll(e, items)}
+                    title="Restore all to Active"
+                    className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border transition-colors shrink-0 bg-white/60 text-amber-600 border-amber-300 hover:bg-amber-50"
+                  >
+                    <ArchiveRestore className="h-3 w-3" />
+                    <span className="hidden sm:inline">Restore all</span>
                   </button>
                 )}
               </button>
@@ -167,7 +182,7 @@ export function GroupedActionTable({ actions, onUpdate, onDelete, showArchived =
                         {items.length} action{items.length !== 1 ? 's' : ''}
                         {doneCount > 0 && ` · ${doneCount} done`}
                       </span>
-                      {!showArchived && (
+                      {!showArchived ? (
                         <button
                           type="button"
                           onClick={e => handleMarkAllDone(e, items)}
@@ -181,6 +196,16 @@ export function GroupedActionTable({ actions, onUpdate, onDelete, showArchived =
                         >
                           <CheckCheck className="h-3 w-3" />
                           {items.every(a => a.status) ? 'Unmark all' : 'All done'}
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={e => handleRestoreAll(e, items)}
+                          title="Restore all to Active"
+                          className="ml-auto flex items-center gap-1 text-xs px-2 py-0.5 rounded-full border transition-colors bg-white/60 text-amber-600 border-amber-300 hover:bg-amber-50"
+                        >
+                          <ArchiveRestore className="h-3 w-3" />
+                          Restore all
                         </button>
                       )}
                     </div>
